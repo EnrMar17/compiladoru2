@@ -8,12 +8,16 @@ export default function Home() {
   const [sqlGenerado, setSqlGenerado] = useState("");
   const [estructura, setEstructura] = useState("");
   const [cargando, setCargando] = useState(false);
+  const [mensajeBD, setMensajeBD] = useState("");
+  const [ejecutandoBD, setEjecutandoBD] = useState(false);
+  const [tipoMensaje, setTipoMensaje] = useState<"ok" | "error" | "">("");
 
   const compilar = async () => {
     setCargando(true);
     setErrores("");
     setSqlGenerado("");
     setEstructura("");
+    setMensajeBD("");
 
     try {
       const res = await fetch("/api/compilar", {
@@ -38,6 +42,38 @@ export default function Home() {
       setErrores("No se pudo conectar con el compilador.");
     } finally {
       setCargando(false);
+    }
+  };
+
+  const crearBD = async () => {
+    if (!sqlGenerado) return;
+
+    setEjecutandoBD(true);
+    setMensajeBD("");
+
+    try {
+      const res = await fetch("/api/ejecutar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sql: sqlGenerado }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setTipoMensaje("error");
+        setMensajeBD(data.error || "Error al crear la BD");
+        return;
+      }
+
+      setTipoMensaje("ok");
+      setMensajeBD("Base de datos creada correctamente");
+    } catch {
+      setMensajeBD("Error de conexión con el servidor");
+    } finally {
+      setEjecutandoBD(false);
     }
   };
 
@@ -121,7 +157,23 @@ cerrar`}
               >
                 Limpiar
               </button>
+
+              <button
+                onClick={crearBD}
+                disabled={!sqlGenerado || ejecutandoBD}
+                className="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {ejecutandoBD ? "Creando BD..." : "Crear Base de Datos"}
+              </button>
             </div>
+            {mensajeBD && (
+              <div className={`mt-3 rounded-xl p-3 text-sm ${tipoMensaje === "ok"
+                ? "bg-green-50 border border-green-300 text-green-700"
+                : "bg-red-50 border border-red-300 text-red-700"
+                }`}>
+                {mensajeBD}
+              </div>
+            )}
           </section>
 
           <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
@@ -161,7 +213,7 @@ cerrar`}
 
               <button
                 onClick={() => descargarArchivo(sqlGenerado, "sql.txt")}
-                disabled={!sqlGenerado}
+                disabled={!sqlGenerado || ejecutandoBD || !!errores}
                 className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Descargar
