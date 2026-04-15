@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 proyecto.g 2026-04-09 19:01:08
+// $ANTLR 3.5.2 proyecto.g 2026-04-14 23:07:59
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -42,10 +42,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = CERRAR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:173:15: ( 'cerrar' )
-			// proyecto.g:173:17: 'cerrar'
+			// proyecto.g:180:7: ( 'fin' )
+			// proyecto.g:180:9: 'fin'
 			{
-			match("cerrar"); 
+			match("fin"); 
 
 			}
 
@@ -63,10 +63,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = NUMERO;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:174:15: ( 'numero' )
-			// proyecto.g:174:17: 'numero'
+			// proyecto.g:181:7: ( 'cantidad' )
+			// proyecto.g:181:9: 'cantidad'
 			{
-			match("numero"); 
+			match("cantidad"); 
 
 			}
 
@@ -84,10 +84,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = TEXTO;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:175:15: ( 'texto' )
-			// proyecto.g:175:17: 'texto'
+			// proyecto.g:182:6: ( 'palabras' )
+			// proyecto.g:182:8: 'palabras'
 			{
-			match("texto"); 
+			match("palabras"); 
 
 			}
 
@@ -105,8 +105,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = FECHA;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:176:15: ( 'fecha' )
-			// proyecto.g:176:17: 'fecha'
+			// proyecto.g:183:6: ( 'fecha' )
+			// proyecto.g:183:8: 'fecha'
 			{
 			match("fecha"); 
 
@@ -126,10 +126,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = IDENTIFICADOR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:177:15: ( 'identificador' )
-			// proyecto.g:177:17: 'identificador'
+			// proyecto.g:184:14: ( 'id' )
+			// proyecto.g:184:16: 'id'
 			{
-			match("identificador"); 
+			match("id"); 
 
 			}
 
@@ -147,10 +147,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = REFERENCIA;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:178:15: ( 'referencia' )
-			// proyecto.g:178:17: 'referencia'
+			// proyecto.g:185:11: ( 'conecta' )
+			// proyecto.g:185:13: 'conecta'
 			{
-			match("referencia"); 
+			match("conecta"); 
 
 			}
 
@@ -168,10 +168,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = TABLA;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:179:15: ( 'tabla' )
-			// proyecto.g:179:17: 'tabla'
+			// proyecto.g:186:6: ( 'lista' )
+			// proyecto.g:186:8: 'lista'
 			{
-			match("tabla"); 
+			match("lista"); 
 
 			}
 
@@ -189,10 +189,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = INICIO;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:180:15: ( 'inicio' )
-			// proyecto.g:180:17: 'inicio'
+			// proyecto.g:187:7: ( 'empieza' )
+			// proyecto.g:187:9: 'empieza'
 			{
-			match("inicio"); 
+			match("empieza"); 
 
 			}
 
@@ -210,10 +210,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = FIN;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:181:15: ( 'fin' )
-			// proyecto.g:181:17: 'fin'
+			// proyecto.g:188:4: ( 'termina' )
+			// proyecto.g:188:6: 'termina'
 			{
-			match("fin"); 
+			match("termina"); 
 
 			}
 
@@ -231,8 +231,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = USAR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:182:15: ( 'usar' )
-			// proyecto.g:182:17: 'usar'
+			// proyecto.g:189:5: ( 'usar' )
+			// proyecto.g:189:7: 'usar'
 			{
 			match("usar"); 
 
@@ -252,8 +252,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = CREAR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:183:15: ( 'crear' )
-			// proyecto.g:183:17: 'crear'
+			// proyecto.g:190:6: ( 'crear' )
+			// proyecto.g:190:8: 'crear'
 			{
 			match("crear"); 
 
@@ -273,8 +273,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = ID;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:185:4: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-			// proyecto.g:185:6: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+			// proyecto.g:192:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+			// proyecto.g:192:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
 			{
 			if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
 				input.consume();
@@ -284,7 +284,7 @@ public class proyectoLexer extends Lexer {
 				recover(mse);
 				throw mse;
 			}
-			// proyecto.g:185:30: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+			// proyecto.g:192:35: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
 			loop1:
 			while (true) {
 				int alt1=2;
@@ -329,10 +329,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = WS;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:186:4: ( ( ' ' | '\\n' | '\\t' | '\\r' )+ )
-			// proyecto.g:186:6: ( ' ' | '\\n' | '\\t' | '\\r' )+
+			// proyecto.g:198:3: ( ( ' ' | '\\n' | '\\t' | '\\r' )+ )
+			// proyecto.g:198:5: ( ' ' | '\\n' | '\\t' | '\\r' )+
 			{
-			// proyecto.g:186:6: ( ' ' | '\\n' | '\\t' | '\\r' )+
+			// proyecto.g:198:5: ( ' ' | '\\n' | '\\t' | '\\r' )+
 			int cnt2=0;
 			loop2:
 			while (true) {
@@ -481,109 +481,103 @@ public class proyectoLexer extends Lexer {
 
 	protected DFA3 dfa3 = new DFA3(this);
 	static final String DFA3_eotS =
-		"\1\uffff\7\10\2\uffff\21\10\1\46\12\10\1\uffff\3\10\1\64\1\10\1\66\1\10"+
-		"\1\70\1\71\1\72\3\10\1\uffff\1\76\1\uffff\1\77\3\uffff\1\10\1\101\1\10"+
-		"\2\uffff\1\10\1\uffff\6\10\1\112\1\10\1\uffff\1\10\1\115\1\uffff";
+		"\1\uffff\10\11\2\uffff\6\11\1\34\4\11\1\41\5\11\1\uffff\4\11\1\uffff\10"+
+		"\11\1\63\1\64\2\11\1\67\1\11\1\71\2\11\2\uffff\2\11\1\uffff\1\11\1\uffff"+
+		"\3\11\1\102\1\11\1\104\1\105\1\106\1\uffff\1\107\4\uffff";
 	static final String DFA3_eofS =
-		"\116\uffff";
+		"\110\uffff";
 	static final String DFA3_minS =
-		"\1\11\1\145\1\165\1\141\1\145\1\144\1\145\1\163\2\uffff\1\162\1\145\1"+
-		"\155\1\170\1\142\1\143\1\156\1\145\1\151\1\146\1\141\1\162\1\141\1\145"+
-		"\1\164\1\154\1\150\1\60\1\156\1\143\1\145\1\162\1\141\2\162\1\157\2\141"+
-		"\1\uffff\1\164\1\151\1\162\1\60\1\162\1\60\1\157\3\60\1\151\1\157\1\145"+
-		"\1\uffff\1\60\1\uffff\1\60\3\uffff\1\146\1\60\1\156\2\uffff\1\151\1\uffff"+
-		"\2\143\1\151\2\141\1\144\1\60\1\157\1\uffff\1\162\1\60\1\uffff";
+		"\1\11\1\145\2\141\1\144\1\151\1\155\1\145\1\163\2\uffff\1\156\1\143\2"+
+		"\156\1\145\1\154\1\60\1\163\1\160\1\162\1\141\1\60\1\150\1\164\1\145\2"+
+		"\141\1\uffff\1\164\1\151\1\155\1\162\1\uffff\1\141\1\151\1\143\1\162\1"+
+		"\142\1\141\1\145\1\151\2\60\1\144\1\164\1\60\1\162\1\60\1\172\1\156\2"+
+		"\uffff\2\141\1\uffff\1\141\1\uffff\2\141\1\144\1\60\1\163\3\60\1\uffff"+
+		"\1\60\4\uffff";
 	static final String DFA3_maxS =
-		"\1\172\1\162\1\165\1\145\1\151\1\156\1\145\1\163\2\uffff\1\162\1\145\1"+
-		"\155\1\170\1\142\1\143\1\156\1\145\1\151\1\146\1\141\1\162\1\141\1\145"+
-		"\1\164\1\154\1\150\1\172\1\156\1\143\1\145\1\162\1\141\2\162\1\157\2\141"+
-		"\1\uffff\1\164\1\151\1\162\1\172\1\162\1\172\1\157\3\172\1\151\1\157\1"+
-		"\145\1\uffff\1\172\1\uffff\1\172\3\uffff\1\146\1\172\1\156\2\uffff\1\151"+
-		"\1\uffff\2\143\1\151\2\141\1\144\1\172\1\157\1\uffff\1\162\1\172\1\uffff";
+		"\1\172\1\151\1\162\1\141\1\144\1\151\1\155\1\145\1\163\2\uffff\1\156\1"+
+		"\143\2\156\1\145\1\154\1\172\1\163\1\160\1\162\1\141\1\172\1\150\1\164"+
+		"\1\145\2\141\1\uffff\1\164\1\151\1\155\1\162\1\uffff\1\141\1\151\1\143"+
+		"\1\162\1\142\1\141\1\145\1\151\2\172\1\144\1\164\1\172\1\162\2\172\1\156"+
+		"\2\uffff\2\141\1\uffff\1\141\1\uffff\2\141\1\144\1\172\1\163\3\172\1\uffff"+
+		"\1\172\4\uffff";
 	static final String DFA3_acceptS =
-		"\10\uffff\1\14\1\15\34\uffff\1\11\15\uffff\1\12\1\uffff\1\13\1\uffff\1"+
-		"\3\1\7\1\4\3\uffff\1\1\1\2\1\uffff\1\10\10\uffff\1\6\2\uffff\1\5";
+		"\11\uffff\1\14\1\15\21\uffff\1\5\4\uffff\1\1\21\uffff\1\12\1\4\2\uffff"+
+		"\1\13\1\uffff\1\7\10\uffff\1\6\1\uffff\1\10\1\11\1\2\1\3";
 	static final String DFA3_specialS =
-		"\116\uffff}>";
+		"\110\uffff}>";
 	static final String[] DFA3_transitionS = {
-			"\2\11\2\uffff\1\11\22\uffff\1\11\40\uffff\32\10\4\uffff\1\10\1\uffff"+
-			"\2\10\1\1\2\10\1\4\2\10\1\5\4\10\1\2\3\10\1\6\1\10\1\3\1\7\5\10",
-			"\1\12\14\uffff\1\13",
-			"\1\14",
-			"\1\16\3\uffff\1\15",
-			"\1\17\3\uffff\1\20",
-			"\1\21\11\uffff\1\22",
+			"\2\12\2\uffff\1\12\22\uffff\1\12\40\uffff\32\11\4\uffff\1\11\1\uffff"+
+			"\2\11\1\2\1\11\1\6\1\1\2\11\1\4\2\11\1\5\3\11\1\3\3\11\1\7\1\10\5\11",
+			"\1\14\3\uffff\1\13",
+			"\1\15\15\uffff\1\16\2\uffff\1\17",
+			"\1\20",
+			"\1\21",
+			"\1\22",
 			"\1\23",
 			"\1\24",
-			"",
-			"",
 			"\1\25",
+			"",
+			"",
 			"\1\26",
 			"\1\27",
 			"\1\30",
 			"\1\31",
 			"\1\32",
 			"\1\33",
-			"\1\34",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
 			"\1\35",
 			"\1\36",
 			"\1\37",
 			"\1\40",
-			"\1\41",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
 			"\1\42",
 			"\1\43",
 			"\1\44",
 			"\1\45",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
+			"\1\46",
+			"",
 			"\1\47",
 			"\1\50",
 			"\1\51",
 			"\1\52",
+			"",
 			"\1\53",
 			"\1\54",
 			"\1\55",
 			"\1\56",
 			"\1\57",
 			"\1\60",
-			"",
 			"\1\61",
 			"\1\62",
-			"\1\63",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
 			"\1\65",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
-			"\1\67",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
+			"\1\66",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
+			"\1\70",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
+			"\1\72",
 			"\1\73",
+			"",
+			"",
 			"\1\74",
 			"\1\75",
 			"",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
+			"\1\76",
 			"",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
-			"",
-			"",
-			"",
+			"\1\77",
 			"\1\100",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
-			"\1\102",
-			"",
-			"",
+			"\1\101",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
 			"\1\103",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
 			"",
-			"\1\104",
-			"\1\105",
-			"\1\106",
-			"\1\107",
-			"\1\110",
-			"\1\111",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
-			"\1\113",
+			"\12\11\7\uffff\32\11\4\uffff\1\11\1\uffff\32\11",
 			"",
-			"\1\114",
-			"\12\10\7\uffff\32\10\4\uffff\1\10\1\uffff\32\10",
+			"",
+			"",
 			""
 	};
 

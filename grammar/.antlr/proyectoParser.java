@@ -1,4 +1,4 @@
-// Generated from c:/Users/enriq/OneDrive/Desktop/Tec/8vo Semestre/compiladoru2/grammar/proyecto.g by ANTLR 4.13.1
+// Generated from c:/Users/dcesa/OneDrive/Documents/Tec/Lenguajes y Automatas II/Unidad 2/compiladoru2/grammar/proyecto.g by ANTLR 4.13.1
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +34,8 @@ public class proyectoParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'cerrar'", "'numero'", "'texto'", "'fecha'", "'identificador'", 
-			"'referencia'", "'tabla'", "'inicio'", "'fin'", "'usar'", "'crear'"
+			null, "'fin'", "'cantidad'", "'palabras'", "'fecha'", "'id'", "'conecta'", 
+			"'lista'", "'empieza'", "'termina'", "'usar'", "'crear'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -95,6 +95,7 @@ public class proyectoParser extends Parser {
 	    List<Tabla> tablas = new ArrayList<Tabla>();  
 	    Tabla tablaActual = null;
 	    List<String> camposSQL = new ArrayList<String>();
+	    List<String> foreignKeysSQL = new ArrayList<String>();
 
 	    StringBuilder sql = new StringBuilder();
 	    StringBuilder estructura = new StringBuilder();
@@ -108,7 +109,7 @@ public class proyectoParser extends Parser {
 	            if(t.nombre.equals(nombreTabla)){
 	                for (int j = 0; j < t.atributos.size(); j++){
 	                    Atributo a = t.atributos.get(j);
-	                    if(a.tipoAtributo.equals("identificador")){
+	                    if(a.tipoAtributo.equals("id")){
 	                        return a.nombreAtributo;
 	                    }
 	                }
@@ -318,6 +319,7 @@ public class proyectoParser extends Parser {
 			        tablaActual = t;
 
 			        camposSQL.clear();
+			        foreignKeysSQL.clear();
 			      
 			setState(34); 
 			_errHandler.sync(this);
@@ -332,21 +334,38 @@ public class proyectoParser extends Parser {
 				setState(36); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( _la==ID );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 4156L) != 0) );
 			setState(38);
 			match(FIN);
 
 			        sql.append("CREATE TABLE ").append((((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null)).append("\n");
 			        sql.append("(\n");
 
-			        for (int i = 0; i < camposSQL.size(); i++) {
-			            sql.append(camposSQL.get(i));
-			            if (i < camposSQL.size() - 1) {
-			                sql.append(",\n");
-			            } else {
-			                sql.append("\n");
-			            }
-			        }
+
+			    int total = camposSQL.size() + foreignKeysSQL.size();
+			int contador = 0;
+
+			for (int i = 0; i < camposSQL.size(); i++) {
+			    sql.append(camposSQL.get(i));
+			    contador++;
+
+			    if (contador < total) {
+			        sql.append(",\n");
+			    } else {
+			        sql.append("\n");
+			    }
+			}
+
+			for (int i = 0; i < foreignKeysSQL.size(); i++) {
+			    sql.append(foreignKeysSQL.get(i));
+			    contador++;
+
+			    if (contador < total) {
+			        sql.append(",\n");
+			    } else {
+			        sql.append("\n");
+			    }
+			}
 
 			        sql.append(");\n\n");
 			      
@@ -372,10 +391,22 @@ public class proyectoParser extends Parser {
 		public TerminalNode ID(int i) {
 			return getToken(proyectoParser.ID, i);
 		}
-		public TerminalNode NUMERO() { return getToken(proyectoParser.NUMERO, 0); }
-		public TerminalNode TEXTO() { return getToken(proyectoParser.TEXTO, 0); }
-		public TerminalNode FECHA() { return getToken(proyectoParser.FECHA, 0); }
-		public TerminalNode IDENTIFICADOR() { return getToken(proyectoParser.IDENTIFICADOR, 0); }
+		public List<TerminalNode> FECHA() { return getTokens(proyectoParser.FECHA); }
+		public TerminalNode FECHA(int i) {
+			return getToken(proyectoParser.FECHA, i);
+		}
+		public List<TerminalNode> NUMERO() { return getTokens(proyectoParser.NUMERO); }
+		public TerminalNode NUMERO(int i) {
+			return getToken(proyectoParser.NUMERO, i);
+		}
+		public List<TerminalNode> TEXTO() { return getTokens(proyectoParser.TEXTO); }
+		public TerminalNode TEXTO(int i) {
+			return getToken(proyectoParser.TEXTO, i);
+		}
+		public List<TerminalNode> IDENTIFICADOR() { return getTokens(proyectoParser.IDENTIFICADOR); }
+		public TerminalNode IDENTIFICADOR(int i) {
+			return getToken(proyectoParser.IDENTIFICADOR, i);
+		}
 		public TerminalNode REFERENCIA() { return getToken(proyectoParser.REFERENCIA, 0); }
 		public CampoContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -395,7 +426,16 @@ public class proyectoParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(41);
-				((CampoContext)_localctx).id1 = match(ID);
+				((CampoContext)_localctx).id1 = _input.LT(1);
+				_la = _input.LA(1);
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 4156L) != 0)) ) {
+					((CampoContext)_localctx).id1 = (Token)_errHandler.recoverInline(this);
+				}
+				else {
+					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+					_errHandler.reportMatch(this);
+					consume();
+				}
 				setState(42);
 				((CampoContext)_localctx).t = _input.LT(1);
 				_la = _input.LA(1);
@@ -408,14 +448,14 @@ public class proyectoParser extends Parser {
 					consume();
 				}
 
-				          if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("texto")==0) 
-				              camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " VARCHAR(300)");
-				          else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("fecha")==0)
-				              camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " DATE"); 
-				          else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("numero")==0)
-				              camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
-				          else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("identificador")==0)
-				              camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
+				          if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("palabras")==0) 
+				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " VARCHAR(300)");
+				else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("fecha")==0)
+				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " DATE"); 
+				else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("cantidad")==0)
+				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
+				else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("id")==0)
+				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
 
 				          Atributo a = new Atributo();
 				          a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
@@ -435,12 +475,12 @@ public class proyectoParser extends Parser {
 				setState(46);
 				((CampoContext)_localctx).id2 = match(ID);
 
-				          camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
-				          camposSQL.add("   FOREIGN KEY (" + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + ") REFERENCES " + (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null) + "(" + obtenerPK((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null)) + ")");
+				        camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
 
+				        foreignKeysSQL.add("   FOREIGN KEY (" + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + ") REFERENCES " + (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null) + "(" + obtenerPK((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null)) + ")");
 				          Atributo a = new Atributo();
 				          a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
-				          a.tipoAtributo = "referencia";
+				          a.tipoAtributo = "conecta";
 				          a.tablaReferencia = (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null);
 				          tablaActual.atributos.add(a);
 				      
@@ -497,7 +537,7 @@ public class proyectoParser extends Parser {
 			                          .append(" : ")
 			                          .append(a.tipoAtributo);
 
-			                if(a.tipoAtributo.equals("referencia")){
+			                if(a.tipoAtributo.equals("conecta")){
 			                    estructura.append(" -> ")
 			                              .append(a.tablaReferencia);
 			                }
@@ -532,29 +572,29 @@ public class proyectoParser extends Parser {
 		"\u0003\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0001"+
 		"\u0004\u0001\u0004\u0003\u00041\b\u0004\u0001\u0005\u0001\u0005\u0001"+
 		"\u0005\u0001\u0005\u0000\u0000\u0006\u0000\u0002\u0004\u0006\b\n\u0000"+
-		"\u0001\u0001\u0000\u0002\u00052\u0000\f\u0001\u0000\u0000\u0000\u0002"+
-		"\u0015\u0001\u0000\u0000\u0000\u0004\u0019\u0001\u0000\u0000\u0000\u0006"+
-		"\u001d\u0001\u0000\u0000\u0000\b0\u0001\u0000\u0000\u0000\n2\u0001\u0000"+
-		"\u0000\u0000\f\r\u0003\u0002\u0001\u0000\r\u000f\u0003\u0004\u0002\u0000"+
-		"\u000e\u0010\u0003\u0006\u0003\u0000\u000f\u000e\u0001\u0000\u0000\u0000"+
-		"\u0010\u0011\u0001\u0000\u0000\u0000\u0011\u000f\u0001\u0000\u0000\u0000"+
-		"\u0011\u0012\u0001\u0000\u0000\u0000\u0012\u0013\u0001\u0000\u0000\u0000"+
-		"\u0013\u0014\u0003\n\u0005\u0000\u0014\u0001\u0001\u0000\u0000\u0000\u0015"+
-		"\u0016\u0005\u000b\u0000\u0000\u0016\u0017\u0005\f\u0000\u0000\u0017\u0018"+
-		"\u0006\u0001\uffff\uffff\u0000\u0018\u0003\u0001\u0000\u0000\u0000\u0019"+
-		"\u001a\u0005\n\u0000\u0000\u001a\u001b\u0005\f\u0000\u0000\u001b\u001c"+
-		"\u0006\u0002\uffff\uffff\u0000\u001c\u0005\u0001\u0000\u0000\u0000\u001d"+
-		"\u001e\u0005\u0007\u0000\u0000\u001e\u001f\u0005\f\u0000\u0000\u001f "+
-		"\u0005\b\u0000\u0000 \"\u0006\u0003\uffff\uffff\u0000!#\u0003\b\u0004"+
-		"\u0000\"!\u0001\u0000\u0000\u0000#$\u0001\u0000\u0000\u0000$\"\u0001\u0000"+
-		"\u0000\u0000$%\u0001\u0000\u0000\u0000%&\u0001\u0000\u0000\u0000&\'\u0005"+
-		"\t\u0000\u0000\'(\u0006\u0003\uffff\uffff\u0000(\u0007\u0001\u0000\u0000"+
-		"\u0000)*\u0005\f\u0000\u0000*+\u0007\u0000\u0000\u0000+1\u0006\u0004\uffff"+
-		"\uffff\u0000,-\u0005\f\u0000\u0000-.\u0005\u0006\u0000\u0000./\u0005\f"+
-		"\u0000\u0000/1\u0006\u0004\uffff\uffff\u00000)\u0001\u0000\u0000\u0000"+
-		"0,\u0001\u0000\u0000\u00001\t\u0001\u0000\u0000\u000023\u0005\u0001\u0000"+
-		"\u000034\u0006\u0005\uffff\uffff\u00004\u000b\u0001\u0000\u0000\u0000"+
-		"\u0003\u0011$0";
+		"\u0002\u0002\u0000\u0002\u0005\f\f\u0001\u0000\u0002\u00052\u0000\f\u0001"+
+		"\u0000\u0000\u0000\u0002\u0015\u0001\u0000\u0000\u0000\u0004\u0019\u0001"+
+		"\u0000\u0000\u0000\u0006\u001d\u0001\u0000\u0000\u0000\b0\u0001\u0000"+
+		"\u0000\u0000\n2\u0001\u0000\u0000\u0000\f\r\u0003\u0002\u0001\u0000\r"+
+		"\u000f\u0003\u0004\u0002\u0000\u000e\u0010\u0003\u0006\u0003\u0000\u000f"+
+		"\u000e\u0001\u0000\u0000\u0000\u0010\u0011\u0001\u0000\u0000\u0000\u0011"+
+		"\u000f\u0001\u0000\u0000\u0000\u0011\u0012\u0001\u0000\u0000\u0000\u0012"+
+		"\u0013\u0001\u0000\u0000\u0000\u0013\u0014\u0003\n\u0005\u0000\u0014\u0001"+
+		"\u0001\u0000\u0000\u0000\u0015\u0016\u0005\u000b\u0000\u0000\u0016\u0017"+
+		"\u0005\f\u0000\u0000\u0017\u0018\u0006\u0001\uffff\uffff\u0000\u0018\u0003"+
+		"\u0001\u0000\u0000\u0000\u0019\u001a\u0005\n\u0000\u0000\u001a\u001b\u0005"+
+		"\f\u0000\u0000\u001b\u001c\u0006\u0002\uffff\uffff\u0000\u001c\u0005\u0001"+
+		"\u0000\u0000\u0000\u001d\u001e\u0005\u0007\u0000\u0000\u001e\u001f\u0005"+
+		"\f\u0000\u0000\u001f \u0005\b\u0000\u0000 \"\u0006\u0003\uffff\uffff\u0000"+
+		"!#\u0003\b\u0004\u0000\"!\u0001\u0000\u0000\u0000#$\u0001\u0000\u0000"+
+		"\u0000$\"\u0001\u0000\u0000\u0000$%\u0001\u0000\u0000\u0000%&\u0001\u0000"+
+		"\u0000\u0000&\'\u0005\t\u0000\u0000\'(\u0006\u0003\uffff\uffff\u0000("+
+		"\u0007\u0001\u0000\u0000\u0000)*\u0007\u0000\u0000\u0000*+\u0007\u0001"+
+		"\u0000\u0000+1\u0006\u0004\uffff\uffff\u0000,-\u0005\f\u0000\u0000-.\u0005"+
+		"\u0006\u0000\u0000./\u0005\f\u0000\u0000/1\u0006\u0004\uffff\uffff\u0000"+
+		"0)\u0001\u0000\u0000\u00000,\u0001\u0000\u0000\u00001\t\u0001\u0000\u0000"+
+		"\u000023\u0005\u0001\u0000\u000034\u0006\u0005\uffff\uffff\u00004\u000b"+
+		"\u0001\u0000\u0000\u0000\u0003\u0011$0";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
