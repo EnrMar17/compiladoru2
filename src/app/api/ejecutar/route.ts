@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { getDB } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -9,11 +9,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "SQL no válido" }, { status: 400 });
     }
 
+    // 🔍 detectar nombre BD
+    const match = sql.match(/CREATE DATABASE (\w+)/i);
+    const nombreBD = match ? match[1] : "default";
+
+    const db = getDB(nombreBD); // ✅ SOLO UNA VEZ
+
+    // 🔥 limpiar SQL
     let sqlLimpio = sql
       .replace(/CREATE DATABASE .*?;/gi, "")
       .replace(/USE .*?;/gi, "")
       .replace(/AUTO_INCREMENT/gi, "")
-      .replace(/ENGINE=.*?;/gi, ""); 
+      .replace(/ENGINE=.*?;/gi, "");
 
     const instrucciones = sqlLimpio.split(";");
 
@@ -23,7 +30,7 @@ export async function POST(req: Request) {
       if (!limpia) continue;
 
       try {
-        db.prepare(limpia).run();
+        db.prepare(limpia).run(); // 🔥 AQUÍ ESTABA LO QUE FALTABA
       } catch (e: any) {
         return NextResponse.json(
           {
@@ -36,7 +43,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       ok: true,
-      mensaje: "Base de datos creada correctamente",
+      mensaje: `Base de datos "${nombreBD}" creada correctamente`,
     });
   } catch (error: any) {
     return NextResponse.json(
