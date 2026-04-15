@@ -24,3 +24,46 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.swal-popup {
+  border-radius: 1.5rem !important;
+  padding: 2rem !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.swal-title {
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.swal-text {
+  color: #64748b !important;
+  font-size: 0.95rem !important;
+}
+
+.swal-confirm {
+  background: #22c55e !important; /* verde moderno */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.6rem 1.4rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 10px rgba(34,197,94,0.3) !important;
+}
+
+.swal-confirm:hover {
+  background: #16a34a !important;
+}
+
+.swal-cancel {
+  background: #e2e8f0 !important; /* gris claro elegante */
+  color: #0f172a !important;
+  border-radius: 9999px !important;
+  padding: 0.6rem 1.4rem !important;
+  font-weight: 500 !important;
+}
+
+.swal-cancel:hover {
+  background: #cbd5f5 !important;
+}

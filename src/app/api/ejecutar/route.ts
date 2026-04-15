@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
+import fs from "fs";
+import path from "path";
 
 export async function POST(req: Request) {
   try {
@@ -9,13 +11,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "SQL no válido" }, { status: 400 });
     }
 
-    // 🔍 detectar nombre BD
     const match = sql.match(/CREATE DATABASE (\w+)/i);
     const nombreBD = match ? match[1] : "default";
 
-    const db = getDB(nombreBD); // ✅ SOLO UNA VEZ
+    const dbPath = path.join(process.cwd(), "databases", `${nombreBD}.db`);
+    const existe = fs.existsSync(dbPath);
 
-    // 🔥 limpiar SQL
+    const url = new URL(req.url);
+    const overwrite = url.searchParams.get("overwrite");
+
+    if (existe && overwrite !== "true") {
+      return NextResponse.json({
+        existe: true,
+        mensaje: `La base "${nombreBD}" ya existe`,
+      });
+    }
+
+    if (existe && overwrite === "true") {
+      try {
+        fs.unlinkSync(dbPath);
+      } catch (err: any) {
+        return NextResponse.json(
+          { error: "No se pudo sobrescribir la base (archivo en uso)" },
+          { status: 500 },
+        );
+      }
+    }
+
+    const db = getDB(nombreBD);
+
     let sqlLimpio = sql
       .replace(/CREATE DATABASE .*?;/gi, "")
       .replace(/USE .*?;/gi, "")
@@ -26,12 +50,12 @@ export async function POST(req: Request) {
 
     for (let inst of instrucciones) {
       const limpia = inst.trim();
-
       if (!limpia) continue;
 
       try {
-        db.prepare(limpia).run(); // 🔥 AQUÍ ESTABA LO QUE FALTABA
+        db.prepare(limpia).run();
       } catch (e: any) {
+        db.close();
         return NextResponse.json(
           {
             error: "Error en instrucción SQL: " + limpia + " → " + e.message,
@@ -41,9 +65,14 @@ export async function POST(req: Request) {
       }
     }
 
+    db.close();
+
     return NextResponse.json({
       ok: true,
-      mensaje: `Base de datos "${nombreBD}" creada correctamente`,
+      mensaje:
+        overwrite === "true"
+          ? `Base de datos "${nombreBD}" sobrescrita correctamente`
+          : `Base de datos "${nombreBD}" creada correctamente`,
     });
   } catch (error: any) {
     return NextResponse.json(
