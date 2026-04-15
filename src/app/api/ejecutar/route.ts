@@ -11,10 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "SQL no válido" }, { status: 400 });
     }
 
-<<<<<<< HEAD
     // detectar nombre BD
-=======
->>>>>>> 5f4174fcbdd698ddda86707fca08b3c7fcac6d06
     const match = sql.match(/CREATE DATABASE (\w+)/i);
     const nombreBD = match ? match[1] : "default";
 
