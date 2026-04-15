@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 import Editor from "@monaco-editor/react";
 import { useRef } from "react";
 
-
 export default function Home() {
   const [codigo, setCodigo] = useState("");
   const [errores, setErrores] = useState("");
@@ -299,7 +298,6 @@ export default function Home() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 rounded-3xl bg-gradient-to-r from-slate-900 to-slate-700 p-6 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-
             {/* TEXTO */}
             <div>
               <h1 className="text-3xl font-bold text-white">
@@ -318,15 +316,6 @@ export default function Home() {
                 </span>
               </div>
             </div>
-
-            {/* STATUS */}
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-green-400"></span>
-              <span className="text-sm text-slate-200">
-                Sistema activo
-              </span>
-            </div>
-
           </div>
         </div>
 
@@ -334,7 +323,9 @@ export default function Home() {
           <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Entrada</h2>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Entrada
+                </h2>
                 <p className="text-sm text-slate-500">
                   Escribe aquí las instrucciones del lenguaje.
                 </p>
@@ -386,10 +377,13 @@ export default function Home() {
               </button>
             </div>
             {mensajeBD && (
-              <div className={`mt-3 rounded-xl p-3 text-sm ${tipoMensaje === "ok"
-                ? "bg-green-50 border border-green-300 text-green-700"
-                : "bg-red-50 border border-red-300 text-red-700"
-                }`}>
+              <div
+                className={`mt-3 rounded-xl p-3 text-sm ${
+                  tipoMensaje === "ok"
+                    ? "bg-green-50 border border-green-300 text-green-700"
+                    : "bg-red-50 border border-red-300 text-red-700"
+                }`}
+              >
                 {mensajeBD}
               </div>
             )}
@@ -424,7 +418,9 @@ export default function Home() {
           <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">SQL generado</h2>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  SQL generado
+                </h2>
                 <p className="text-sm text-slate-500">
                   Resultado equivalente en SQL.
                 </p>
@@ -534,9 +530,7 @@ export default function Home() {
                         <span className="font-medium text-slate-800">
                           {c.name}
                         </span>
-                        <span className="ml-2 text-slate-500">
-                          ({c.type})
-                        </span>
+                        <span className="ml-2 text-slate-500">({c.type})</span>
                       </div>
 
                       <div className="flex gap-2">
