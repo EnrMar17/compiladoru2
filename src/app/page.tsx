@@ -20,7 +20,6 @@ export default function Home() {
   const [estructuraBD, setEstructuraBD] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
-
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
 
@@ -260,7 +259,6 @@ export default function Home() {
 
       cargarBases();
       setEjecutandoBD(false);
-
     } catch (error) {
       await Swal.fire({
         title: "Error",
@@ -301,7 +299,7 @@ export default function Home() {
             {/* TEXTO */}
             <div>
               <h1 className="text-3xl font-bold text-white">
-                Lenguaje para crear bases de datos
+                Generador de Aplicaciones - Lenguajes y Automatas II
               </h1>
 
               <div className="mt-2 flex gap-2">
