@@ -1,4 +1,4 @@
-// Generated from c:/Users/dcesa/OneDrive/Documents/Tec/Lenguajes y Automatas II/Unidad 2/compiladoru2/grammar/proyecto.g by ANTLR 4.13.1
+// Generated from c:/Users/tony2/OneDrive/Desktop/8vo Semestre/PracticasLyA_II/Unidad 2/compiladoru2/grammar/proyecto.g by ANTLR 4.13.1
 
 import java.util.ArrayList;
 import java.util.List;

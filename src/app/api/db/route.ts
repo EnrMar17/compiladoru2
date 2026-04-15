@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
     const dbFolder = path.join(process.cwd(), "databases");
 
-    // 🔹 1. LISTAR BASES DE DATOS
+    // LISTAR BASES DE DATOS
     if (!nombre) {
       const archivos = fs.readdirSync(dbFolder);
 
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ bases });
     }
 
-    // 🔹 2. LEER UNA BD ESPECÍFICA
+    // LEER UNA BD ESPECÍFICA
     const db = getDB(nombre);
 
     // tablas

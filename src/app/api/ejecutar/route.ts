@@ -9,13 +9,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "SQL no válido" }, { status: 400 });
     }
 
-    // 🔍 detectar nombre BD
+    // detectar nombre BD
     const match = sql.match(/CREATE DATABASE (\w+)/i);
     const nombreBD = match ? match[1] : "default";
 
     const db = getDB(nombreBD); // ✅ SOLO UNA VEZ
 
-    // 🔥 limpiar SQL
+    // +limpiar SQL
     let sqlLimpio = sql
       .replace(/CREATE DATABASE .*?;/gi, "")
       .replace(/USE .*?;/gi, "")
