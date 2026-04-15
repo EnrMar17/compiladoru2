@@ -6,7 +6,7 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
-// Fuerza runtime de Node.js para poder usar fs y procesos externos
+// runtime de Node.js para poder usar fs y procesos externos
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
@@ -20,29 +20,26 @@ export async function POST(req: Request) {
       );
     }
 
-    // Ajusta esta ruta a donde tengas tus archivos Java/ANTLR
     const compilerDir = path.join(process.cwd(), "grammar");
 
     const entradaPath = path.join(compilerDir, "entrada.txt");
     const sqlPath = path.join(compilerDir, "sql.txt");
     const estructuraPath = path.join(compilerDir, "estructura.txt");
 
-    // Guarda el caso de prueba escrito en la página
+    // Guarda el caso prubea
     await fs.writeFile(entradaPath, codigo, "utf8");
 
-    // Limpia archivos anteriores por si quedaron de una compilación previa
+    // Limpia anteriores
     await fs.rm(sqlPath, { force: true });
     await fs.rm(estructuraPath, { force: true });
 
-    // Ejecuta: java Test entrada.txt
-    // execFile ejecuta el binario directamente, sin pasar por shell
     const { stdout, stderr } = await execFileAsync(
       "java",
       ["Test", "entrada.txt"],
       { cwd: compilerDir }
     );
 
-    // Si el compilador reportó errores, se muestran en la página
+    // mostrar errores del compilador
     if (stderr && stderr.trim().length > 0) {
       return NextResponse.json({
         errores: stderr.trim(),

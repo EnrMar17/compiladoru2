@@ -44,7 +44,7 @@ body {
 }
 
 .swal-confirm {
-  background: #22c55e !important; /* verde moderno */
+  background: #22c55e !important;
   color: white !important;
   border-radius: 9999px !important;
   padding: 0.6rem 1.4rem !important;
@@ -57,7 +57,7 @@ body {
 }
 
 .swal-cancel {
-  background: #e2e8f0 !important; /* gris claro elegante */
+  background: #e2e8f0 !important;
   color: #0f172a !important;
   border-radius: 9999px !important;
   padding: 0.6rem 1.4rem !important;

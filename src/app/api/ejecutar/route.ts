@@ -41,10 +41,7 @@ export async function POST(req: Request) {
 
     const db = getDB(nombreBD);
 
-<<<<<<< HEAD
     // +limpiar SQL
-=======
->>>>>>> 5f4174fcbdd698ddda86707fca08b3c7fcac6d06
     let sqlLimpio = sql
       .replace(/CREATE DATABASE .*?;/gi, "")
       .replace(/USE .*?;/gi, "")

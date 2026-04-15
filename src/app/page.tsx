@@ -487,7 +487,7 @@ export default function Home() {
               value={bdSeleccionada}
               onChange={(e) => cargarEstructuraBD(e.target.value)}
             >
-              <option value="">Selecciona una base</option>
+              <option value="">Selecciona una base de datos</option>
               {bases.map((b) => (
                 <option key={b} value={b}>
                   {b}
