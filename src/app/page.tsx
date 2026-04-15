@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
+import Editor from "@monaco-editor/react";
+import { useRef } from "react";
 
 export default function Home() {
   const [codigo, setCodigo] = useState("");
@@ -15,6 +18,68 @@ export default function Home() {
   const [bases, setBases] = useState<string[]>([]);
   const [bdSeleccionada, setBdSeleccionada] = useState("");
   const [estructuraBD, setEstructuraBD] = useState<any[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+
+  const editorRef = useRef<any>(null);
+  const monacoRef = useRef<any>(null);
+
+  const handleEditorDidMount = (editor: any, monaco: any) => {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+
+    monaco.editor.defineTheme("miTema", {
+      base: "vs",
+      inherit: true,
+      rules: [],
+      colors: {
+        "editor.background": "#f8fafc",
+        "editor.lineHighlightBackground": "#e2e8f0",
+        "editorCursor.foreground": "#0f172a",
+        "editorLineNumber.foreground": "#94a3b8",
+        "editorLineNumber.activeForeground": "#0f172a",
+      },
+    });
+
+    monaco.editor.setTheme("miTema");
+  };
+
+  const marcarErrores = (textoErrores: string) => {
+    if (!monacoRef.current || !editorRef.current) return;
+
+    const monaco = monacoRef.current;
+    const model = editorRef.current.getModel();
+
+    const markers = [];
+
+    const lineas = textoErrores.split("\n");
+
+    for (let linea of lineas) {
+      const match = linea.match(/Línea (\d+): (.*)/);
+
+      if (match) {
+        const numeroLinea = parseInt(match[1]);
+        const mensaje = match[2];
+
+        markers.push({
+          startLineNumber: numeroLinea,
+          endLineNumber: numeroLinea,
+          startColumn: 1,
+          endColumn: 100,
+          message: mensaje,
+          severity: monaco.MarkerSeverity.Error,
+        });
+
+        editorRef.current.revealLine(numeroLinea);
+      }
+    }
+
+    monaco.editor.setModelMarkers(model, "owner", markers);
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const cargarBases = async () => {
     const res = await fetch("/api/db");
@@ -55,10 +120,17 @@ export default function Home() {
 
       if (!res.ok) {
         setErrores(data.error || "Ocurrió un error al compilar.");
+        marcarErrores("");
         return;
       }
 
       setErrores(data.errores || "");
+
+      if (data.errores) {
+        marcarErrores(data.errores);
+      } else {
+        marcarErrores("");
+      }
       setSqlGenerado(data.sql || "");
       setEstructura(data.estructura || "");
     } catch {
@@ -69,12 +141,9 @@ export default function Home() {
   };
 
   const crearBD = async () => {
-    if (!sqlGenerado) return;
-
-    setEjecutandoBD(true);
-    setMensajeBD("");
-
     try {
+      setEjecutandoBD(true);
+
       const res = await fetch("/api/ejecutar", {
         method: "POST",
         headers: {
@@ -85,18 +154,128 @@ export default function Home() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        setTipoMensaje("error");
-        setMensajeBD(data.error || "Error al crear la BD");
+      if (data.existe) {
+        const resultado = await Swal.fire({
+          title: "Sobrescribir base de datos",
+          text: "Ya existe una base con este nombre. Si continúas, se reemplazará completamente.",
+          showCancelButton: true,
+          confirmButtonText: "Sobrescribir",
+          cancelButtonText: "Cancelar",
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-title",
+            htmlContainer: "swal-text",
+            confirmButton: "swal-confirm",
+            cancelButton: "swal-cancel",
+          },
+        });
+
+        if (!resultado.isConfirmed) {
+          setEjecutandoBD(false);
+          return;
+        }
+
+        const res2 = await fetch("/api/ejecutar?overwrite=true", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sql: sqlGenerado }),
+        });
+
+        const data2 = await res2.json();
+
+        if (data2.error) {
+          await Swal.fire({
+            title: "Error",
+            text: data2.error,
+            icon: "error",
+            customClass: {
+              popup: "swal-popup",
+              title: "swal-title",
+              htmlContainer: "swal-text",
+              confirmButton: "swal-cancel",
+            },
+          });
+
+          setEjecutandoBD(false);
+          return;
+        }
+
+        await Swal.fire({
+          title: "Base sobrescrita",
+          text: data2.mensaje,
+          icon: "success",
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-title",
+            htmlContainer: "swal-text",
+            confirmButton: "swal-confirm",
+          },
+        });
+
+        setSqlGenerado("");
+        setEstructura("");
+        setErrores("");
+        marcarErrores("");
+
+        cargarBases();
+        setEjecutandoBD(false);
         return;
       }
 
-      setTipoMensaje("ok");
-      setMensajeBD("Base de datos creada correctamente");
-    } catch {
-      setMensajeBD("Error de conexión con el servidor");
-    } finally {
+      if (data.error) {
+        await Swal.fire({
+          title: "Error",
+          text: data.error,
+          icon: "error",
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-title",
+            htmlContainer: "swal-text",
+            confirmButton: "swal-cancel",
+          },
+        });
+
+        setEjecutandoBD(false);
+        return;
+      }
+
+      await Swal.fire({
+        title: "Base creada",
+        text: data.mensaje,
+        icon: "success",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          htmlContainer: "swal-text",
+          confirmButton: "swal-confirm",
+        },
+      });
+
+      setSqlGenerado("");
+      setEstructura("");
+      setErrores("");
+      marcarErrores("");
+
+      cargarBases();
       setEjecutandoBD(false);
+
+    } catch (error) {
+      await Swal.fire({
+        title: "Error",
+        text: "Error al crear la base de datos",
+        icon: "error",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          htmlContainer: "swal-text",
+          confirmButton: "swal-cancel",
+        },
+      });
+
+      setEjecutandoBD(false);
+      console.error(error);
     }
   };
 
@@ -153,35 +332,25 @@ export default function Home() {
               </div>
             </div>
 
-            <textarea
-              value={codigo}
-              onChange={(e) => setCodigo(e.target.value)}
-              className="h-96 w-full resize-none rounded-2xl border border-slate-300 bg-white p-4 font-mono text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              placeholder={`crear escuela
-usar escuela
-
-lista alumno
-empieza
-    id_alumno id
-    nombre palabras
-    edad cantidad
-termina
-
-lista materia
-empieza
-    id_materia id
-    nombre palabras
-termina
-
-lista inscripcion
-empieza
-    id_inscripcion id
-    alumno conecta alumno
-    materia conecta materia
-termina
-
-fin`}
-            />
+            <div className="h-96 w-full overflow-hidden rounded-2xl border border-slate-300 bg-white">
+              <Editor
+                height="100%"
+                defaultLanguage="plaintext"
+                value={codigo}
+                onChange={(value) => {
+                  setCodigo(value || "");
+                  marcarErrores("");
+                }}
+                onMount={handleEditorDidMount}
+                options={{
+                  fontSize: 14,
+                  minimap: { enabled: false },
+                  lineNumbers: "on",
+                  automaticLayout: true,
+                  wordWrap: "on",
+                }}
+              />
+            </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
               <button
@@ -201,7 +370,7 @@ fin`}
 
               <button
                 onClick={crearBD}
-                disabled={!sqlGenerado || ejecutandoBD}
+                disabled={!mounted || !sqlGenerado || ejecutandoBD}
                 className="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {ejecutandoBD ? "Creando BD..." : "Crear Base de Datos"}
