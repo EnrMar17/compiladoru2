@@ -17,6 +17,28 @@ import java.util.List;
 
     String nombreBD = "";
 
+    public boolean tablaExiste(String nombre) {
+        for (Tabla t : tablas) {
+            if (t.nombre.equals(nombre)) return true;
+        }
+        return false;
+    }
+
+    public boolean campoExiste(String nombre) {
+        if (tablaActual == null) return false;
+        for (Atributo a : tablaActual.atributos) {
+            if (a.nombreAtributo.equals(nombre)) return true;
+        }
+        return false;
+    }
+
+    public boolean existeTabla(String nombre) {
+        for (Tabla t : tablas) {
+            if (t.nombre.equals(nombre)) return true;
+        }
+        return false;
+    }
+
     public String obtenerPK(String nombreTabla){
         for (int i = 0; i < tablas.size(); i++){
             Tabla t = tablas.get(i);
@@ -70,42 +92,49 @@ usar:
 
 tabla:
 	TABLA ID INICIO { 
-        Tabla t = new Tabla();
-        t.nombre = $ID.text;
-        tablas.add(t);
-        tablaActual = t;
+        if (tablaExiste($ID.text)) {
+            errores.append("Línea ")
+                   .append($ID.getLine())
+                   .append(": la tabla '")
+                   .append($ID.text)
+                   .append("' ya existe\n");
+        } else {
+            Tabla t = new Tabla();
+            t.nombre = $ID.text;
+            tablas.add(t);
+            tablaActual = t;
 
-        camposSQL.clear();
-        foreignKeysSQL.clear();
+            camposSQL.clear();
+            foreignKeysSQL.clear();
+        }
       } campo+ FIN {
         sql.append("CREATE TABLE ").append($ID.text).append("\n");
         sql.append("(\n");
 
+        int total = camposSQL.size() + foreignKeysSQL.size();
+        int contador = 0;
 
-    int total = camposSQL.size() + foreignKeysSQL.size();
-int contador = 0;
+        for (int i = 0; i < camposSQL.size(); i++) {
+            sql.append(camposSQL.get(i));
+            contador++;
 
-for (int i = 0; i < camposSQL.size(); i++) {
-    sql.append(camposSQL.get(i));
-    contador++;
+            if (contador < total) {
+                sql.append(",\n");
+            } else {
+                sql.append("\n");
+            }
+        }
 
-    if (contador < total) {
-        sql.append(",\n");
-    } else {
-        sql.append("\n");
-    }
-}
+        for (int i = 0; i < foreignKeysSQL.size(); i++) {
+            sql.append(foreignKeysSQL.get(i));
+            contador++;
 
-for (int i = 0; i < foreignKeysSQL.size(); i++) {
-    sql.append(foreignKeysSQL.get(i));
-    contador++;
-
-    if (contador < total) {
-        sql.append(",\n");
-    } else {
-        sql.append("\n");
-    }
-}
+            if (contador < total) {
+                sql.append(",\n");
+            } else {
+                sql.append("\n");
+            }
+        }
 
         sql.append(");\n\n");
       };
@@ -117,30 +146,47 @@ campo:
 		| FECHA
 		| IDENTIFICADOR
 	) {
-          if(($t.text).compareTo("palabras")==0) 
-    camposSQL.add("   " + $id1.text + " VARCHAR(300)");
-else if(($t.text).compareTo("fecha")==0)
-    camposSQL.add("   " + $id1.text + " DATE"); 
-else if(($t.text).compareTo("cantidad")==0)
-    camposSQL.add("   " + $id1.text + " INTEGER");
-else if(($t.text).compareTo("id")==0)
-    camposSQL.add("   " + $id1.text + " INTEGER PRIMARY KEY AUTOINCREMENT");
+        if (campoExiste($id1.text)) {
+            errores.append("Línea ")
+                   .append($id1.getLine())
+                   .append(": el campo '")
+                   .append($id1.text)
+                   .append("' ya existe en la tabla\n");
+        } else {
+            if(($t.text).compareTo("palabras")==0) 
+                camposSQL.add("   " + $id1.text + " VARCHAR(300)");
+            else if(($t.text).compareTo("fecha")==0)
+                camposSQL.add("   " + $id1.text + " DATE"); 
+            else if(($t.text).compareTo("cantidad")==0)
+                camposSQL.add("   " + $id1.text + " INTEGER");
+            else if(($t.text).compareTo("id")==0)
+                camposSQL.add("   " + $id1.text + " INTEGER PRIMARY KEY AUTOINCREMENT");
 
-          Atributo a = new Atributo();
-          a.nombreAtributo = $id1.text;
-          a.tipoAtributo = $t.text;
-          a.tablaReferencia = "";
-          tablaActual.atributos.add(a);
+            Atributo a = new Atributo();
+            a.nombreAtributo = $id1.text;
+            a.tipoAtributo = $t.text;
+            a.tablaReferencia = "";
+            tablaActual.atributos.add(a);
+        }
       }
 	| id1 = ID REFERENCIA id2 = ID {
-        camposSQL.add("   " + $id1.text + " INTEGER");
+        if (!existeTabla($id2.text)) {
+            errores.append("Línea ")
+                   .append($id2.getLine())
+                   .append(": la tabla '")
+                   .append($id2.text)
+                   .append("' no existe\n");
+        } else {
+            camposSQL.add("   " + $id1.text + " INTEGER");
 
-        foreignKeysSQL.add("   FOREIGN KEY (" + $id1.text + ") REFERENCES " + $id2.text + "(" + obtenerPK($id2.text) + ")");
-          Atributo a = new Atributo();
-          a.nombreAtributo = $id1.text;
-          a.tipoAtributo = "conecta";
-          a.tablaReferencia = $id2.text;
-          tablaActual.atributos.add(a);
+            foreignKeysSQL.add("   FOREIGN KEY (" + $id1.text + ") REFERENCES " + $id2.text + "(" + obtenerPK($id2.text) + ")");
+
+            Atributo a = new Atributo();
+            a.nombreAtributo = $id1.text;
+            a.tipoAtributo = "conecta";
+            a.tablaReferencia = $id2.text;
+            tablaActual.atributos.add(a);
+        }
       };
 
 cerrar:

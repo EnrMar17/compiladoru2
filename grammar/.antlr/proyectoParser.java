@@ -1,4 +1,4 @@
-// Generated from c:/Users/tony2/OneDrive/Desktop/8vo Semestre/PracticasLyA_II/Unidad 2/compiladoru2/grammar/proyecto.g by ANTLR 4.13.1
+// Generated from c:/Users/dcesa/OneDrive/Documents/Tec/Lenguajes y Automatas II/Unidad 2/compiladoru2/grammar/proyecto.g by ANTLR 4.13.1
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +102,28 @@ public class proyectoParser extends Parser {
 	    StringBuilder errores = new StringBuilder();
 
 	    String nombreBD = "";
+
+	    public boolean tablaExiste(String nombre) {
+	        for (Tabla t : tablas) {
+	            if (t.nombre.equals(nombre)) return true;
+	        }
+	        return false;
+	    }
+
+	    public boolean campoExiste(String nombre) {
+	        if (tablaActual == null) return false;
+	        for (Atributo a : tablaActual.atributos) {
+	            if (a.nombreAtributo.equals(nombre)) return true;
+	        }
+	        return false;
+	    }
+
+	    public boolean existeTabla(String nombre) {
+	        for (Tabla t : tablas) {
+	            if (t.nombre.equals(nombre)) return true;
+	        }
+	        return false;
+	    }
 
 	    public String obtenerPK(String nombreTabla){
 	        for (int i = 0; i < tablas.size(); i++){
@@ -313,13 +335,21 @@ public class proyectoParser extends Parser {
 			setState(31);
 			match(INICIO);
 			 
-			        Tabla t = new Tabla();
-			        t.nombre = (((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null);
-			        tablas.add(t);
-			        tablaActual = t;
+			        if (tablaExiste((((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null))) {
+			            errores.append("Línea ")
+			                   .append(((TablaContext)_localctx).ID.getLine())
+			                   .append(": la tabla '")
+			                   .append((((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null))
+			                   .append("' ya existe\n");
+			        } else {
+			            Tabla t = new Tabla();
+			            t.nombre = (((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null);
+			            tablas.add(t);
+			            tablaActual = t;
 
-			        camposSQL.clear();
-			        foreignKeysSQL.clear();
+			            camposSQL.clear();
+			            foreignKeysSQL.clear();
+			        }
 			      
 			setState(34); 
 			_errHandler.sync(this);
@@ -341,31 +371,30 @@ public class proyectoParser extends Parser {
 			        sql.append("CREATE TABLE ").append((((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null)).append("\n");
 			        sql.append("(\n");
 
+			        int total = camposSQL.size() + foreignKeysSQL.size();
+			        int contador = 0;
 
-			    int total = camposSQL.size() + foreignKeysSQL.size();
-			int contador = 0;
+			        for (int i = 0; i < camposSQL.size(); i++) {
+			            sql.append(camposSQL.get(i));
+			            contador++;
 
-			for (int i = 0; i < camposSQL.size(); i++) {
-			    sql.append(camposSQL.get(i));
-			    contador++;
+			            if (contador < total) {
+			                sql.append(",\n");
+			            } else {
+			                sql.append("\n");
+			            }
+			        }
 
-			    if (contador < total) {
-			        sql.append(",\n");
-			    } else {
-			        sql.append("\n");
-			    }
-			}
+			        for (int i = 0; i < foreignKeysSQL.size(); i++) {
+			            sql.append(foreignKeysSQL.get(i));
+			            contador++;
 
-			for (int i = 0; i < foreignKeysSQL.size(); i++) {
-			    sql.append(foreignKeysSQL.get(i));
-			    contador++;
-
-			    if (contador < total) {
-			        sql.append(",\n");
-			    } else {
-			        sql.append("\n");
-			    }
-			}
+			            if (contador < total) {
+			                sql.append(",\n");
+			            } else {
+			                sql.append("\n");
+			            }
+			        }
 
 			        sql.append(");\n\n");
 			      
@@ -448,20 +477,28 @@ public class proyectoParser extends Parser {
 					consume();
 				}
 
-				          if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("palabras")==0) 
-				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " VARCHAR(300)");
-				else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("fecha")==0)
-				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " DATE"); 
-				else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("cantidad")==0)
-				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
-				else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("id")==0)
-				    camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
+				        if (campoExiste((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))) {
+				            errores.append("Línea ")
+				                   .append(((CampoContext)_localctx).id1.getLine())
+				                   .append(": el campo '")
+				                   .append((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))
+				                   .append("' ya existe en la tabla\n");
+				        } else {
+				            if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("palabras")==0) 
+				                camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " VARCHAR(300)");
+				            else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("fecha")==0)
+				                camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " DATE"); 
+				            else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("cantidad")==0)
+				                camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
+				            else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("id")==0)
+				                camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
 
-				          Atributo a = new Atributo();
-				          a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
-				          a.tipoAtributo = (((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null);
-				          a.tablaReferencia = "";
-				          tablaActual.atributos.add(a);
+				            Atributo a = new Atributo();
+				            a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
+				            a.tipoAtributo = (((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null);
+				            a.tablaReferencia = "";
+				            tablaActual.atributos.add(a);
+				        }
 				      
 				}
 				break;
@@ -475,14 +512,23 @@ public class proyectoParser extends Parser {
 				setState(46);
 				((CampoContext)_localctx).id2 = match(ID);
 
-				        camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
+				        if (!existeTabla((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null))) {
+				            errores.append("Línea ")
+				                   .append(((CampoContext)_localctx).id2.getLine())
+				                   .append(": la tabla '")
+				                   .append((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null))
+				                   .append("' no existe\n");
+				        } else {
+				            camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
 
-				        foreignKeysSQL.add("   FOREIGN KEY (" + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + ") REFERENCES " + (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null) + "(" + obtenerPK((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null)) + ")");
-				          Atributo a = new Atributo();
-				          a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
-				          a.tipoAtributo = "conecta";
-				          a.tablaReferencia = (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null);
-				          tablaActual.atributos.add(a);
+				            foreignKeysSQL.add("   FOREIGN KEY (" + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + ") REFERENCES " + (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null) + "(" + obtenerPK((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null)) + ")");
+
+				            Atributo a = new Atributo();
+				            a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
+				            a.tipoAtributo = "conecta";
+				            a.tablaReferencia = (((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null);
+				            tablaActual.atributos.add(a);
+				        }
 				      
 				}
 				break;

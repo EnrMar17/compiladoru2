@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 proyecto.g 2026-04-14 23:07:59
+// $ANTLR 3.5.2 proyecto.g 2026-04-15 10:14:07
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -42,8 +42,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = CERRAR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:180:7: ( 'fin' )
-			// proyecto.g:180:9: 'fin'
+			// proyecto.g:226:7: ( 'fin' )
+			// proyecto.g:226:9: 'fin'
 			{
 			match("fin"); 
 
@@ -63,8 +63,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = NUMERO;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:181:7: ( 'cantidad' )
-			// proyecto.g:181:9: 'cantidad'
+			// proyecto.g:227:7: ( 'cantidad' )
+			// proyecto.g:227:9: 'cantidad'
 			{
 			match("cantidad"); 
 
@@ -84,8 +84,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = TEXTO;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:182:6: ( 'palabras' )
-			// proyecto.g:182:8: 'palabras'
+			// proyecto.g:228:6: ( 'palabras' )
+			// proyecto.g:228:8: 'palabras'
 			{
 			match("palabras"); 
 
@@ -105,8 +105,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = FECHA;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:183:6: ( 'fecha' )
-			// proyecto.g:183:8: 'fecha'
+			// proyecto.g:229:6: ( 'fecha' )
+			// proyecto.g:229:8: 'fecha'
 			{
 			match("fecha"); 
 
@@ -126,8 +126,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = IDENTIFICADOR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:184:14: ( 'id' )
-			// proyecto.g:184:16: 'id'
+			// proyecto.g:230:14: ( 'id' )
+			// proyecto.g:230:16: 'id'
 			{
 			match("id"); 
 
@@ -147,8 +147,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = REFERENCIA;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:185:11: ( 'conecta' )
-			// proyecto.g:185:13: 'conecta'
+			// proyecto.g:231:11: ( 'conecta' )
+			// proyecto.g:231:13: 'conecta'
 			{
 			match("conecta"); 
 
@@ -168,8 +168,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = TABLA;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:186:6: ( 'lista' )
-			// proyecto.g:186:8: 'lista'
+			// proyecto.g:232:6: ( 'lista' )
+			// proyecto.g:232:8: 'lista'
 			{
 			match("lista"); 
 
@@ -189,8 +189,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = INICIO;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:187:7: ( 'empieza' )
-			// proyecto.g:187:9: 'empieza'
+			// proyecto.g:233:7: ( 'empieza' )
+			// proyecto.g:233:9: 'empieza'
 			{
 			match("empieza"); 
 
@@ -210,8 +210,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = FIN;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:188:4: ( 'termina' )
-			// proyecto.g:188:6: 'termina'
+			// proyecto.g:234:4: ( 'termina' )
+			// proyecto.g:234:6: 'termina'
 			{
 			match("termina"); 
 
@@ -231,8 +231,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = USAR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:189:5: ( 'usar' )
-			// proyecto.g:189:7: 'usar'
+			// proyecto.g:235:5: ( 'usar' )
+			// proyecto.g:235:7: 'usar'
 			{
 			match("usar"); 
 
@@ -252,8 +252,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = CREAR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:190:6: ( 'crear' )
-			// proyecto.g:190:8: 'crear'
+			// proyecto.g:236:6: ( 'crear' )
+			// proyecto.g:236:8: 'crear'
 			{
 			match("crear"); 
 
@@ -273,8 +273,8 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = ID;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:192:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-			// proyecto.g:192:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+			// proyecto.g:238:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+			// proyecto.g:238:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
 			{
 			if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
 				input.consume();
@@ -284,7 +284,7 @@ public class proyectoLexer extends Lexer {
 				recover(mse);
 				throw mse;
 			}
-			// proyecto.g:192:35: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+			// proyecto.g:238:35: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
 			loop1:
 			while (true) {
 				int alt1=2;
@@ -329,10 +329,10 @@ public class proyectoLexer extends Lexer {
 		try {
 			int _type = WS;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// proyecto.g:198:3: ( ( ' ' | '\\n' | '\\t' | '\\r' )+ )
-			// proyecto.g:198:5: ( ' ' | '\\n' | '\\t' | '\\r' )+
+			// proyecto.g:244:3: ( ( ' ' | '\\n' | '\\t' | '\\r' )+ )
+			// proyecto.g:244:5: ( ' ' | '\\n' | '\\t' | '\\r' )+
 			{
-			// proyecto.g:198:5: ( ' ' | '\\n' | '\\t' | '\\r' )+
+			// proyecto.g:244:5: ( ' ' | '\\n' | '\\t' | '\\r' )+
 			int cnt2=0;
 			loop2:
 			while (true) {

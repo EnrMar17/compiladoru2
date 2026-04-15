@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 proyecto.g 2026-04-14 23:07:59
+// $ANTLR 3.5.2 proyecto.g 2026-04-15 10:14:06
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +61,28 @@ public class proyectoParser extends Parser {
 
 	    String nombreBD = "";
 
+	    public boolean tablaExiste(String nombre) {
+	        for (Tabla t : tablas) {
+	            if (t.nombre.equals(nombre)) return true;
+	        }
+	        return false;
+	    }
+
+	    public boolean campoExiste(String nombre) {
+	        if (tablaActual == null) return false;
+	        for (Atributo a : tablaActual.atributos) {
+	            if (a.nombreAtributo.equals(nombre)) return true;
+	        }
+	        return false;
+	    }
+
+	    public boolean existeTabla(String nombre) {
+	        for (Tabla t : tablas) {
+	            if (t.nombre.equals(nombre)) return true;
+	        }
+	        return false;
+	    }
+
 	    public String obtenerPK(String nombreTabla){
 	        for (int i = 0; i < tablas.size(); i++){
 	            Tabla t = tablas.get(i);
@@ -101,11 +123,11 @@ public class proyectoParser extends Parser {
 
 
 	// $ANTLR start "inicio"
-	// proyecto.g:58:1: inicio : creacion usar ( tabla )+ cerrar ;
+	// proyecto.g:80:1: inicio : creacion usar ( tabla )+ cerrar ;
 	public final void inicio() throws RecognitionException {
 		try {
-			// proyecto.g:58:7: ( creacion usar ( tabla )+ cerrar )
-			// proyecto.g:58:9: creacion usar ( tabla )+ cerrar
+			// proyecto.g:80:7: ( creacion usar ( tabla )+ cerrar )
+			// proyecto.g:80:9: creacion usar ( tabla )+ cerrar
 			{
 			pushFollow(FOLLOW_creacion_in_inicio21);
 			creacion();
@@ -115,7 +137,7 @@ public class proyectoParser extends Parser {
 			usar();
 			state._fsp--;
 
-			// proyecto.g:58:23: ( tabla )+
+			// proyecto.g:80:23: ( tabla )+
 			int cnt1=0;
 			loop1:
 			while (true) {
@@ -127,7 +149,7 @@ public class proyectoParser extends Parser {
 
 				switch (alt1) {
 				case 1 :
-					// proyecto.g:58:23: tabla
+					// proyecto.g:80:23: tabla
 					{
 					pushFollow(FOLLOW_tabla_in_inicio25);
 					tabla();
@@ -164,13 +186,13 @@ public class proyectoParser extends Parser {
 
 
 	// $ANTLR start "creacion"
-	// proyecto.g:60:1: creacion : CREAR ID ;
+	// proyecto.g:82:1: creacion : CREAR ID ;
 	public final void creacion() throws RecognitionException {
 		Token ID1=null;
 
 		try {
-			// proyecto.g:60:9: ( CREAR ID )
-			// proyecto.g:61:2: CREAR ID
+			// proyecto.g:82:9: ( CREAR ID )
+			// proyecto.g:83:2: CREAR ID
 			{
 			match(input,CREAR,FOLLOW_CREAR_in_creacion36); 
 			ID1=(Token)match(input,ID,FOLLOW_ID_in_creacion38); 
@@ -194,13 +216,13 @@ public class proyectoParser extends Parser {
 
 
 	// $ANTLR start "usar"
-	// proyecto.g:66:1: usar : USAR ID ;
+	// proyecto.g:88:1: usar : USAR ID ;
 	public final void usar() throws RecognitionException {
 		Token ID2=null;
 
 		try {
-			// proyecto.g:66:5: ( USAR ID )
-			// proyecto.g:67:2: USAR ID
+			// proyecto.g:88:5: ( USAR ID )
+			// proyecto.g:89:2: USAR ID
 			{
 			match(input,USAR,FOLLOW_USAR_in_usar48); 
 			ID2=(Token)match(input,ID,FOLLOW_ID_in_usar50); 
@@ -223,27 +245,35 @@ public class proyectoParser extends Parser {
 
 
 	// $ANTLR start "tabla"
-	// proyecto.g:71:1: tabla : TABLA ID INICIO ( campo )+ FIN ;
+	// proyecto.g:93:1: tabla : TABLA ID INICIO ( campo )+ FIN ;
 	public final void tabla() throws RecognitionException {
 		Token ID3=null;
 
 		try {
-			// proyecto.g:71:6: ( TABLA ID INICIO ( campo )+ FIN )
-			// proyecto.g:72:2: TABLA ID INICIO ( campo )+ FIN
+			// proyecto.g:93:6: ( TABLA ID INICIO ( campo )+ FIN )
+			// proyecto.g:94:2: TABLA ID INICIO ( campo )+ FIN
 			{
 			match(input,TABLA,FOLLOW_TABLA_in_tabla60); 
 			ID3=(Token)match(input,ID,FOLLOW_ID_in_tabla62); 
 			match(input,INICIO,FOLLOW_INICIO_in_tabla64); 
 			 
-			        Tabla t = new Tabla();
-			        t.nombre = (ID3!=null?ID3.getText():null);
-			        tablas.add(t);
-			        tablaActual = t;
+			        if (tablaExiste((ID3!=null?ID3.getText():null))) {
+			            errores.append("Línea ")
+			                   .append(ID3.getLine())
+			                   .append(": la tabla '")
+			                   .append((ID3!=null?ID3.getText():null))
+			                   .append("' ya existe\n");
+			        } else {
+			            Tabla t = new Tabla();
+			            t.nombre = (ID3!=null?ID3.getText():null);
+			            tablas.add(t);
+			            tablaActual = t;
 
-			        camposSQL.clear();
-			        foreignKeysSQL.clear();
+			            camposSQL.clear();
+			            foreignKeysSQL.clear();
+			        }
 			      
-			// proyecto.g:80:9: ( campo )+
+			// proyecto.g:110:9: ( campo )+
 			int cnt2=0;
 			loop2:
 			while (true) {
@@ -255,7 +285,7 @@ public class proyectoParser extends Parser {
 
 				switch (alt2) {
 				case 1 :
-					// proyecto.g:80:9: campo
+					// proyecto.g:110:9: campo
 					{
 					pushFollow(FOLLOW_campo_in_tabla68);
 					campo();
@@ -277,31 +307,30 @@ public class proyectoParser extends Parser {
 			        sql.append("CREATE TABLE ").append((ID3!=null?ID3.getText():null)).append("\n");
 			        sql.append("(\n");
 
+			        int total = camposSQL.size() + foreignKeysSQL.size();
+			        int contador = 0;
 
-			    int total = camposSQL.size() + foreignKeysSQL.size();
-			int contador = 0;
+			        for (int i = 0; i < camposSQL.size(); i++) {
+			            sql.append(camposSQL.get(i));
+			            contador++;
 
-			for (int i = 0; i < camposSQL.size(); i++) {
-			    sql.append(camposSQL.get(i));
-			    contador++;
+			            if (contador < total) {
+			                sql.append(",\n");
+			            } else {
+			                sql.append("\n");
+			            }
+			        }
 
-			    if (contador < total) {
-			        sql.append(",\n");
-			    } else {
-			        sql.append("\n");
-			    }
-			}
+			        for (int i = 0; i < foreignKeysSQL.size(); i++) {
+			            sql.append(foreignKeysSQL.get(i));
+			            contador++;
 
-			for (int i = 0; i < foreignKeysSQL.size(); i++) {
-			    sql.append(foreignKeysSQL.get(i));
-			    contador++;
-
-			    if (contador < total) {
-			        sql.append(",\n");
-			    } else {
-			        sql.append("\n");
-			    }
-			}
+			            if (contador < total) {
+			                sql.append(",\n");
+			            } else {
+			                sql.append("\n");
+			            }
+			        }
 
 			        sql.append(");\n\n");
 			      
@@ -321,14 +350,14 @@ public class proyectoParser extends Parser {
 
 
 	// $ANTLR start "campo"
-	// proyecto.g:113:1: campo : (id1= ( ID | FECHA | NUMERO | TEXTO | IDENTIFICADOR ) t= ( NUMERO | TEXTO | FECHA | IDENTIFICADOR ) |id1= ID REFERENCIA id2= ID );
+	// proyecto.g:142:1: campo : (id1= ( ID | FECHA | NUMERO | TEXTO | IDENTIFICADOR ) t= ( NUMERO | TEXTO | FECHA | IDENTIFICADOR ) |id1= ID REFERENCIA id2= ID );
 	public final void campo() throws RecognitionException {
 		Token id1=null;
 		Token t=null;
 		Token id2=null;
 
 		try {
-			// proyecto.g:113:6: (id1= ( ID | FECHA | NUMERO | TEXTO | IDENTIFICADOR ) t= ( NUMERO | TEXTO | FECHA | IDENTIFICADOR ) |id1= ID REFERENCIA id2= ID )
+			// proyecto.g:142:6: (id1= ( ID | FECHA | NUMERO | TEXTO | IDENTIFICADOR ) t= ( NUMERO | TEXTO | FECHA | IDENTIFICADOR ) |id1= ID REFERENCIA id2= ID )
 			int alt3=2;
 			int LA3_0 = input.LA(1);
 			if ( (LA3_0==ID) ) {
@@ -365,7 +394,7 @@ public class proyectoParser extends Parser {
 
 			switch (alt3) {
 				case 1 :
-					// proyecto.g:114:2: id1= ( ID | FECHA | NUMERO | TEXTO | IDENTIFICADOR ) t= ( NUMERO | TEXTO | FECHA | IDENTIFICADOR )
+					// proyecto.g:143:2: id1= ( ID | FECHA | NUMERO | TEXTO | IDENTIFICADOR ) t= ( NUMERO | TEXTO | FECHA | IDENTIFICADOR )
 					{
 					id1=input.LT(1);
 					if ( input.LA(1)==FECHA||(input.LA(1) >= ID && input.LA(1) <= IDENTIFICADOR)||input.LA(1)==NUMERO||input.LA(1)==TEXTO ) {
@@ -386,38 +415,55 @@ public class proyectoParser extends Parser {
 						throw mse;
 					}
 
-					          if(((t!=null?t.getText():null)).compareTo("palabras")==0) 
-					    camposSQL.add("   " + (id1!=null?id1.getText():null) + " VARCHAR(300)");
-					else if(((t!=null?t.getText():null)).compareTo("fecha")==0)
-					    camposSQL.add("   " + (id1!=null?id1.getText():null) + " DATE"); 
-					else if(((t!=null?t.getText():null)).compareTo("cantidad")==0)
-					    camposSQL.add("   " + (id1!=null?id1.getText():null) + " INTEGER");
-					else if(((t!=null?t.getText():null)).compareTo("id")==0)
-					    camposSQL.add("   " + (id1!=null?id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
+					        if (campoExiste((id1!=null?id1.getText():null))) {
+					            errores.append("Línea ")
+					                   .append(id1.getLine())
+					                   .append(": el campo '")
+					                   .append((id1!=null?id1.getText():null))
+					                   .append("' ya existe en la tabla\n");
+					        } else {
+					            if(((t!=null?t.getText():null)).compareTo("palabras")==0) 
+					                camposSQL.add("   " + (id1!=null?id1.getText():null) + " VARCHAR(300)");
+					            else if(((t!=null?t.getText():null)).compareTo("fecha")==0)
+					                camposSQL.add("   " + (id1!=null?id1.getText():null) + " DATE"); 
+					            else if(((t!=null?t.getText():null)).compareTo("cantidad")==0)
+					                camposSQL.add("   " + (id1!=null?id1.getText():null) + " INTEGER");
+					            else if(((t!=null?t.getText():null)).compareTo("id")==0)
+					                camposSQL.add("   " + (id1!=null?id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
 
-					          Atributo a = new Atributo();
-					          a.nombreAtributo = (id1!=null?id1.getText():null);
-					          a.tipoAtributo = (t!=null?t.getText():null);
-					          a.tablaReferencia = "";
-					          tablaActual.atributos.add(a);
+					            Atributo a = new Atributo();
+					            a.nombreAtributo = (id1!=null?id1.getText():null);
+					            a.tipoAtributo = (t!=null?t.getText():null);
+					            a.tablaReferencia = "";
+					            tablaActual.atributos.add(a);
+					        }
 					      
 					}
 					break;
 				case 2 :
-					// proyecto.g:135:4: id1= ID REFERENCIA id2= ID
+					// proyecto.g:172:4: id1= ID REFERENCIA id2= ID
 					{
 					id1=(Token)match(input,ID,FOLLOW_ID_in_campo145); 
 					match(input,REFERENCIA,FOLLOW_REFERENCIA_in_campo147); 
 					id2=(Token)match(input,ID,FOLLOW_ID_in_campo153); 
 
-					        camposSQL.add("   " + (id1!=null?id1.getText():null) + " INTEGER");
+					        if (!existeTabla((id2!=null?id2.getText():null))) {
+					            errores.append("Línea ")
+					                   .append(id2.getLine())
+					                   .append(": la tabla '")
+					                   .append((id2!=null?id2.getText():null))
+					                   .append("' no existe\n");
+					        } else {
+					            camposSQL.add("   " + (id1!=null?id1.getText():null) + " INTEGER");
 
-					        foreignKeysSQL.add("   FOREIGN KEY (" + (id1!=null?id1.getText():null) + ") REFERENCES " + (id2!=null?id2.getText():null) + "(" + obtenerPK((id2!=null?id2.getText():null)) + ")");
-					          Atributo a = new Atributo();
-					          a.nombreAtributo = (id1!=null?id1.getText():null);
-					          a.tipoAtributo = "conecta";
-					          a.tablaReferencia = (id2!=null?id2.getText():null);
-					          tablaActual.atributos.add(a);
+					            foreignKeysSQL.add("   FOREIGN KEY (" + (id1!=null?id1.getText():null) + ") REFERENCES " + (id2!=null?id2.getText():null) + "(" + obtenerPK((id2!=null?id2.getText():null)) + ")");
+
+					            Atributo a = new Atributo();
+					            a.nombreAtributo = (id1!=null?id1.getText():null);
+					            a.tipoAtributo = "conecta";
+					            a.tablaReferencia = (id2!=null?id2.getText():null);
+					            tablaActual.atributos.add(a);
+					        }
 					      
 					}
 					break;
@@ -437,11 +483,11 @@ public class proyectoParser extends Parser {
 
 
 	// $ANTLR start "cerrar"
-	// proyecto.g:146:1: cerrar : CERRAR ;
+	// proyecto.g:192:1: cerrar : CERRAR ;
 	public final void cerrar() throws RecognitionException {
 		try {
-			// proyecto.g:146:7: ( CERRAR )
-			// proyecto.g:147:2: CERRAR
+			// proyecto.g:192:7: ( CERRAR )
+			// proyecto.g:193:2: CERRAR
 			{
 			match(input,CERRAR,FOLLOW_CERRAR_in_cerrar163); 
 
