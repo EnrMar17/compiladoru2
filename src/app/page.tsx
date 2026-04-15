@@ -169,27 +169,27 @@ export default function Home() {
               placeholder={`crear escuela
 usar escuela
 
-tabla alumno
-inicio
-    id_alumno identificador
-    nombre texto
-    edad numero
-fin
+lista alumno
+empieza
+    id_alumno id
+    nombre palabras
+    edad cantidad
+termina
 
-tabla materia
-inicio
-    id_materia identificador
-    nombre texto
-fin
+lista materia
+empieza
+    id_materia id
+    nombre palabras
+termina
 
-tabla inscripcion
-inicio
-    id_inscripcion identificador
-    alumno referencia alumno
-    materia referencia materia
-fin
+lista inscripcion
+empieza
+    id_inscripcion id
+    alumno conecta alumno
+    materia conecta materia
+termina
 
-cerrar`}
+fin`}
             />
 
             <div className="mt-4 flex flex-wrap gap-3">
