@@ -39,6 +39,26 @@ import java.util.List;
         return false;
     }
 
+    public boolean esReservada(String texto) {
+        return texto.equals("crear") || texto.equals("usar") ||
+               texto.equals("lista") || texto.equals("empieza") ||
+               texto.equals("termina") || texto.equals("fin") ||
+               texto.equals("id") || texto.equals("cantidad") ||
+               texto.equals("palabras") || texto.equals("fecha") ||
+               texto.equals("conecta");
+    }
+
+    public boolean tienePK(String nombreTabla) {
+        for (Tabla t : tablas) {
+            if (t.nombre.equals(nombreTabla)) {
+                for (Atributo a : t.atributos) {
+                    if (a.tipoAtributo.equals("id")) return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public String obtenerPK(String nombreTabla){
         for (int i = 0; i < tablas.size(); i++){
             Tabla t = tablas.get(i);
@@ -108,6 +128,15 @@ tabla:
             foreignKeysSQL.clear();
         }
       } campo+ FIN {
+
+        if (camposSQL.isEmpty()) {
+            errores.append("Línea ")
+                   .append($ID.getLine())
+                   .append(": la tabla '")
+                   .append($ID.text)
+                   .append("' no tiene campos\n");
+        }
+
         sql.append("CREATE TABLE ").append($ID.text).append("\n");
         sql.append("(\n");
 
@@ -146,6 +175,22 @@ campo:
 		| FECHA
 		| IDENTIFICADOR
 	) {
+        if (tablaActual == null) {
+            errores.append("Línea ")
+                   .append($id1.getLine())
+                   .append(": campo fuera de una tabla\n");
+            return;
+        }
+
+        if (esReservada($id1.text)) {
+            errores.append("Línea ")
+                   .append($id1.getLine())
+                   .append(": '")
+                   .append($id1.text)
+                   .append("' es palabra reservada\n");
+            return;
+        }
+
         if (campoExiste($id1.text)) {
             errores.append("Línea ")
                    .append($id1.getLine())
@@ -161,6 +206,13 @@ campo:
                 camposSQL.add("   " + $id1.text + " INTEGER");
             else if(($t.text).compareTo("id")==0)
                 camposSQL.add("   " + $id1.text + " INTEGER PRIMARY KEY AUTOINCREMENT");
+            else {
+                errores.append("Línea ")
+                       .append($t.getLine())
+                       .append(": tipo de dato inválido '")
+                       .append($t.text)
+                       .append("'\n");
+            }
 
             Atributo a = new Atributo();
             a.nombreAtributo = $id1.text;
@@ -176,6 +228,18 @@ campo:
                    .append(": la tabla '")
                    .append($id2.text)
                    .append("' no existe\n");
+        } else if (!tienePK($id2.text)) {
+            errores.append("Línea ")
+                   .append($id2.getLine())
+                   .append(": la tabla '")
+                   .append($id2.text)
+                   .append("' no tiene clave primaria\n");
+        } else if (campoExiste($id1.text)) {
+            errores.append("Línea ")
+                   .append($id1.getLine())
+                   .append(": el campo '")
+                   .append($id1.text)
+                   .append("' ya existe en la tabla\n");
         } else {
             camposSQL.add("   " + $id1.text + " INTEGER");
 
@@ -241,4 +305,5 @@ ID: ('a' ..'z' | 'A' ..'Z' | '_') (
 		| '0' ..'9'
 		| '_'
 	)*;
+
 WS: (' ' | '\n' | '\t' | '\r')+ {$channel=HIDDEN; };

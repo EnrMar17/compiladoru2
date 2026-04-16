@@ -125,6 +125,26 @@ public class proyectoParser extends Parser {
 	        return false;
 	    }
 
+	    public boolean esReservada(String texto) {
+	        return texto.equals("crear") || texto.equals("usar") ||
+	               texto.equals("lista") || texto.equals("empieza") ||
+	               texto.equals("termina") || texto.equals("fin") ||
+	               texto.equals("id") || texto.equals("cantidad") ||
+	               texto.equals("palabras") || texto.equals("fecha") ||
+	               texto.equals("conecta");
+	    }
+
+	    public boolean tienePK(String nombreTabla) {
+	        for (Tabla t : tablas) {
+	            if (t.nombre.equals(nombreTabla)) {
+	                for (Atributo a : t.atributos) {
+	                    if (a.tipoAtributo.equals("id")) return true;
+	                }
+	            }
+	        }
+	        return false;
+	    }
+
 	    public String obtenerPK(String nombreTabla){
 	        for (int i = 0; i < tablas.size(); i++){
 	            Tabla t = tablas.get(i);
@@ -368,6 +388,15 @@ public class proyectoParser extends Parser {
 			setState(38);
 			match(FIN);
 
+
+			        if (camposSQL.isEmpty()) {
+			            errores.append("Línea ")
+			                   .append(((TablaContext)_localctx).ID.getLine())
+			                   .append(": la tabla '")
+			                   .append((((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null))
+			                   .append("' no tiene campos\n");
+			        }
+
 			        sql.append("CREATE TABLE ").append((((TablaContext)_localctx).ID!=null?((TablaContext)_localctx).ID.getText():null)).append("\n");
 			        sql.append("(\n");
 
@@ -477,6 +506,22 @@ public class proyectoParser extends Parser {
 					consume();
 				}
 
+				        if (tablaActual == null) {
+				            errores.append("Línea ")
+				                   .append(((CampoContext)_localctx).id1.getLine())
+				                   .append(": campo fuera de una tabla\n");
+				            return;
+				        }
+
+				        if (esReservada((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))) {
+				            errores.append("Línea ")
+				                   .append(((CampoContext)_localctx).id1.getLine())
+				                   .append(": '")
+				                   .append((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))
+				                   .append("' es palabra reservada\n");
+				            return;
+				        }
+
 				        if (campoExiste((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))) {
 				            errores.append("Línea ")
 				                   .append(((CampoContext)_localctx).id1.getLine())
@@ -492,6 +537,13 @@ public class proyectoParser extends Parser {
 				                camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
 				            else if(((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null)).compareTo("id")==0)
 				                camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER PRIMARY KEY AUTOINCREMENT");
+				            else {
+				                errores.append("Línea ")
+				                       .append(((CampoContext)_localctx).t.getLine())
+				                       .append(": tipo de dato inválido '")
+				                       .append((((CampoContext)_localctx).t!=null?((CampoContext)_localctx).t.getText():null))
+				                       .append("'\n");
+				            }
 
 				            Atributo a = new Atributo();
 				            a.nombreAtributo = (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null);
@@ -518,6 +570,18 @@ public class proyectoParser extends Parser {
 				                   .append(": la tabla '")
 				                   .append((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null))
 				                   .append("' no existe\n");
+				        } else if (!tienePK((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null))) {
+				            errores.append("Línea ")
+				                   .append(((CampoContext)_localctx).id2.getLine())
+				                   .append(": la tabla '")
+				                   .append((((CampoContext)_localctx).id2!=null?((CampoContext)_localctx).id2.getText():null))
+				                   .append("' no tiene clave primaria\n");
+				        } else if (campoExiste((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))) {
+				            errores.append("Línea ")
+				                   .append(((CampoContext)_localctx).id1.getLine())
+				                   .append(": el campo '")
+				                   .append((((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null))
+				                   .append("' ya existe en la tabla\n");
 				        } else {
 				            camposSQL.add("   " + (((CampoContext)_localctx).id1!=null?((CampoContext)_localctx).id1.getText():null) + " INTEGER");
 
