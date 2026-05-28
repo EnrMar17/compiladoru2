@@ -208,6 +208,14 @@ public class proyectoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_inicio; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).enterInicio(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).exitInicio(this);
+		}
 	}
 
 	public final InicioContext inicio() throws RecognitionException {
@@ -258,6 +266,14 @@ public class proyectoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_creacion; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).enterCreacion(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).exitCreacion(this);
+		}
 	}
 
 	public final CreacionContext creacion() throws RecognitionException {
@@ -295,6 +311,14 @@ public class proyectoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_usar; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).enterUsar(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).exitUsar(this);
+		}
 	}
 
 	public final UsarContext usar() throws RecognitionException {
@@ -339,6 +363,14 @@ public class proyectoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_tabla; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).enterTabla(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).exitTabla(this);
+		}
 	}
 
 	public final TablaContext tabla() throws RecognitionException {
@@ -470,6 +502,14 @@ public class proyectoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_campo; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).enterCampo(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).exitCampo(this);
+		}
 	}
 
 	public final CampoContext campo() throws RecognitionException {
@@ -616,6 +656,14 @@ public class proyectoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_cerrar; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).enterCerrar(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof proyectoListener ) ((proyectoListener)listener).exitCerrar(this);
+		}
 	}
 
 	public final CerrarContext cerrar() throws RecognitionException {
