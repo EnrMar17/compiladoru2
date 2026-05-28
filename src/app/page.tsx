@@ -327,32 +327,86 @@ export default function Home() {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRUD de ${nombreTabla}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-  <div class="contenedor">
-    <h1>CRUD de ${nombreTabla}</h1>
-
-    <form id="formulario" autocomplete="off">
-      <input type="hidden" id="__indice" value="-1">
-${inputs}
-      <div class="acciones">
-        <button type="button" id="btnGuardar">Guardar</button>
-        <button type="button" id="btnLimpiar">Limpiar</button>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="badge">Aplicación CRUD generada</span>
+        <h1>${nombreTabla}</h1>
+        <p>Gestiona los registros de la tabla <strong>${nombreTabla}</strong> con persistencia local.</p>
       </div>
-    </form>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Registros</span>
+          <span class="stat-value" id="contador">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
 
-    <table id="tabla">
-      <thead>
-        <tr>
+  <main class="contenedor">
+    <section class="card">
+      <div class="card-header">
+        <h2 id="formTitulo">Nuevo registro</h2>
+        <p id="formSubtitulo">Completa los campos y presiona Guardar.</p>
+      </div>
+
+      <form id="formulario" autocomplete="off">
+        <input type="hidden" id="__indice" value="-1">
+${inputs}
+        <div class="acciones">
+          <button type="button" id="btnGuardar" class="btn btn-primary">
+            <span class="btn-icon">+</span> Guardar
+          </button>
+          <button type="button" id="btnLimpiar" class="btn btn-secondary">
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-header card-header-row">
+        <div>
+          <h2>Registros</h2>
+          <p>Listado completo de la tabla <strong>${nombreTabla}</strong>.</p>
+        </div>
+        <div class="toolbar">
+          <input type="text" id="buscador" placeholder="Buscar..." class="buscador">
+        </div>
+      </div>
+
+      <div class="tabla-wrapper">
+        <table id="tabla">
+          <thead>
+            <tr>
 ${ths}
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+              <th class="th-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div id="vacio" class="vacio">
+          <div class="vacio-icono">∅</div>
+          <p>No hay registros todavía.</p>
+          <span>Agrega el primero usando el formulario de arriba.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>CRUD generado automáticamente · Persistencia con <code>localStorage</code></p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
@@ -361,40 +415,191 @@ ${ths}
   };
 
   const generarCSS = () => {
-    return `* {
+    return `*, *::before, *::after {
   box-sizing: border-box;
 }
 
-body {
+:root {
+  --c-bg: #f8fafc;
+  --c-surface: #ffffff;
+  --c-border: #e2e8f0;
+  --c-border-strong: #cbd5e1;
+  --c-text: #0f172a;
+  --c-text-soft: #475569;
+  --c-text-muted: #94a3b8;
+  --c-primary: #4f46e5;
+  --c-primary-hover: #4338ca;
+  --c-primary-soft: #eef2ff;
+  --c-danger: #dc2626;
+  --c-danger-hover: #b91c1c;
+  --c-edit: #2563eb;
+  --c-edit-hover: #1d4ed8;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 30px rgba(15, 23, 42, 0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+html, body {
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f1f5f9;
-  color: #0f172a;
-  padding: 30px 20px;
+  padding: 0;
 }
 
-.contenedor {
-  max-width: 900px;
+body {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(1200px 600px at -10% -20%, #e0e7ff 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% -10%, #ede9fe 0%, transparent 55%),
+    var(--c-bg);
+  color: var(--c-text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #312e81 100%);
+  color: #ffffff;
+  padding: 56px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--c-bg));
+}
+
+.hero-inner {
+  max-width: 1100px;
   margin: 0 auto;
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
-h1 {
-  margin: 0 0 24px 0;
-  font-size: 26px;
-  color: #0f172a;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 12px;
+.hero-text h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 12px 0 8px;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
 }
 
+.hero-text p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 16px;
+  max-width: 520px;
+}
+
+.hero-text strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e0e7ff;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 14px 22px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #cbd5e1;
+}
+
+.stat-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+/* CONTENEDOR */
+.contenedor {
+  max-width: 1100px;
+  margin: -40px auto 0;
+  padding: 0 24px 40px;
+  display: grid;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.card {
+  background: var(--c-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--c-border);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.card-header h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.card-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--c-text-soft);
+}
+
+/* FORM */
 form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
+  gap: 16px;
+  padding: 22px 26px 26px;
 }
 
 .campo {
@@ -403,24 +608,37 @@ form {
 }
 
 label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #334155;
+  color: var(--c-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 input {
-  padding: 10px 12px;
+  padding: 11px 14px;
   font-size: 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
   outline: none;
-  background: #f8fafc;
-  transition: border-color 0.15s, background 0.15s;
+  background: #ffffff;
+  color: var(--c-text);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  font-family: inherit;
+}
+
+input::placeholder {
+  color: var(--c-text-muted);
+}
+
+input:hover {
+  border-color: #94a3b8;
 }
 
 input:focus {
-  border-color: #0f172a;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
   background: #ffffff;
 }
 
@@ -428,89 +646,282 @@ input:focus {
   grid-column: 1 / -1;
   display: flex;
   gap: 10px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
+/* BUTTONS */
+.btn,
 button {
-  padding: 10px 18px;
+  font-family: inherit;
+  padding: 11px 22px;
   font-size: 14px;
   font-weight: 600;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s, transform 0.05s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.btn:active,
 button:active {
   transform: translateY(1px);
 }
 
+.btn-primary,
 #btnGuardar {
-  background: #0f172a;
+  background: var(--c-primary);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
+.btn-primary:hover,
 #btnGuardar:hover {
-  background: #1e293b;
+  background: var(--c-primary-hover);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
 }
 
+.btn-secondary,
 #btnLimpiar {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #ffffff;
+  color: var(--c-text);
+  border-color: var(--c-border-strong);
 }
 
+.btn-secondary:hover,
 #btnLimpiar:hover {
-  background: #cbd5e1;
+  background: var(--c-bg);
+  border-color: #94a3b8;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* TOOLBAR / BUSCADOR */
+.toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.buscador {
+  min-width: 240px;
+  padding: 9px 14px;
+  font-size: 13px;
+}
+
+/* TABLA */
+.tabla-wrapper {
+  position: relative;
+  overflow-x: auto;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  font-size: 14px;
 }
 
 thead {
-  background: #0f172a;
-  color: #ffffff;
+  background: #f1f5f9;
 }
 
-th, td {
-  padding: 12px 14px;
+th {
   text-align: left;
-  font-size: 14px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--c-text-soft);
+  border-bottom: 1px solid var(--c-border);
+  white-space: nowrap;
+}
+
+.th-acciones {
+  text-align: right;
+}
+
+td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--c-border);
+  color: var(--c-text);
+  vertical-align: middle;
+}
+
+tbody tr {
+  transition: background 0.12s;
 }
 
 tbody tr:hover {
-  background: #f8fafc;
+  background: var(--c-primary-soft);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.celda-acciones {
+  text-align: right;
+  white-space: nowrap;
 }
 
 .btn-editar,
 .btn-eliminar {
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 12px;
   border-radius: 8px;
-  margin-right: 6px;
+  margin-left: 6px;
   color: #ffffff;
+  font-weight: 600;
 }
 
 .btn-editar {
-  background: #2563eb;
+  background: var(--c-edit);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
 .btn-editar:hover {
-  background: #1d4ed8;
+  background: var(--c-edit-hover);
 }
 
 .btn-eliminar {
-  background: #dc2626;
+  background: var(--c-danger);
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
 }
 
 .btn-eliminar:hover {
-  background: #b91c1c;
+  background: var(--c-danger-hover);
+}
+
+/* ESTADO VACÍO */
+.vacio {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--c-text-muted);
+}
+
+.vacio.activo {
+  display: flex;
+}
+
+.vacio-icono {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--c-bg);
+  border: 2px dashed var(--c-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: var(--c-text-muted);
+  margin-bottom: 14px;
+}
+
+.vacio p {
+  margin: 0 0 4px;
+  font-weight: 600;
+  color: var(--c-text-soft);
+  font-size: 15px;
+}
+
+.vacio span {
+  font-size: 13px;
+}
+
+/* FOOTER */
+.pie {
+  max-width: 1100px;
+  margin: 20px auto 40px;
+  padding: 0 24px;
+  text-align: center;
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
+.pie code {
+  background: var(--c-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--c-text);
+}
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .hero {
+    padding: 36px 20px 60px;
+  }
+
+  .hero-text h1 {
+    font-size: 32px;
+  }
+
+  .contenedor {
+    padding: 0 16px 30px;
+  }
+
+  .card-header,
+  form {
+    padding: 18px;
+  }
+
+  th, td {
+    padding: 12px;
+  }
+
+  .buscador {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+/* SweetAlert custom */
+.swal-popup-custom {
+  border-radius: var(--radius) !important;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif !important;
+}
+
+.swal-title-custom {
+  color: var(--c-text) !important;
+  font-weight: 600 !important;
+}
+
+.swal-confirm-custom {
+  background: var(--c-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 10px 22px !important;
+  font-weight: 600 !important;
+}
+
+.swal-cancel-custom {
+  background: #ffffff !important;
+  color: var(--c-text) !important;
+  border: 1px solid var(--c-border-strong) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 10px 22px !important;
+  font-weight: 600 !important;
+}
+
+.swal-danger-custom {
+  background: var(--c-danger) !important;
 }
 `;
   };
@@ -525,24 +936,78 @@ tbody tr:hover {
 const CAMPOS = ${camposJson};
 
 let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let filtro = "";
 
-const form = document.getElementById("formulario");
 const tbody = document.querySelector("#tabla tbody");
 const inputIndice = document.getElementById("__indice");
+const buscador = document.getElementById("buscador");
+const vacio = document.getElementById("vacio");
+const contador = document.getElementById("contador");
+const formTitulo = document.getElementById("formTitulo");
+const formSubtitulo = document.getElementById("formSubtitulo");
+const btnGuardar = document.getElementById("btnGuardar");
+
+const SWAL_CLASSES = {
+  popup: "swal-popup-custom",
+  title: "swal-title-custom",
+  confirmButton: "swal-confirm-custom",
+  cancelButton: "swal-cancel-custom",
+};
+
+const SWAL_DANGER_CLASSES = Object.assign({}, SWAL_CLASSES, {
+  confirmButton: "swal-confirm-custom swal-danger-custom",
+});
 
 document.getElementById("btnGuardar").addEventListener("click", guardar);
-document.getElementById("btnLimpiar").addEventListener("click", limpiar);
+document.getElementById("btnLimpiar").addEventListener("click", () => {
+  limpiar();
+  modoCrear();
+});
+
+buscador.addEventListener("input", (e) => {
+  filtro = e.target.value.trim().toLowerCase();
+  render();
+});
+
+function notif(icon, title) {
+  if (typeof Swal === "undefined") return;
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon: icon,
+    title: title,
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+    customClass: { popup: "swal-popup-custom", title: "swal-title-custom" },
+  });
+}
 
 function guardar() {
   const datos = {};
+  let vacios = [];
+
   CAMPOS.forEach((campo) => {
     const el = document.getElementById(campo);
-    datos[campo] = el ? el.value : "";
+    const valor = el ? el.value.trim() : "";
+    datos[campo] = valor;
+    if (!valor) vacios.push(campo);
   });
 
-  const idx = parseInt(inputIndice.value, 10);
+  if (vacios.length === CAMPOS.length) {
+    Swal.fire({
+      icon: "warning",
+      title: "Formulario vacío",
+      text: "Completa al menos un campo antes de guardar.",
+      customClass: SWAL_CLASSES,
+    });
+    return;
+  }
 
-  if (idx >= 0) {
+  const idx = parseInt(inputIndice.value, 10);
+  const editando = idx >= 0;
+
+  if (editando) {
     registros[idx] = datos;
   } else {
     registros.push(datos);
@@ -550,7 +1015,10 @@ function guardar() {
 
   persistir();
   limpiar();
+  modoCrear();
   render();
+
+  notif("success", editando ? "Registro actualizado" : "Registro creado");
 }
 
 function editar(i) {
@@ -560,14 +1028,29 @@ function editar(i) {
     if (el) el.value = reg[campo] != null ? reg[campo] : "";
   });
   inputIndice.value = String(i);
+  modoEditar();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function eliminar(i) {
-  if (!confirm("¿Eliminar este registro?")) return;
-  registros.splice(i, 1);
-  persistir();
-  limpiar();
-  render();
+  Swal.fire({
+    title: "¿Eliminar registro?",
+    text: "Esta acción no se puede deshacer.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+    reverseButtons: true,
+    customClass: SWAL_DANGER_CLASSES,
+  }).then((res) => {
+    if (!res.isConfirmed) return;
+    registros.splice(i, 1);
+    persistir();
+    limpiar();
+    modoCrear();
+    render();
+    notif("success", "Registro eliminado");
+  });
 }
 
 function limpiar() {
@@ -578,23 +1061,61 @@ function limpiar() {
   inputIndice.value = "-1";
 }
 
+function modoEditar() {
+  formTitulo.textContent = "Editar registro";
+  formSubtitulo.textContent = "Modifica los campos y presiona Guardar para actualizar.";
+  btnGuardar.innerHTML = '<span class="btn-icon">✓</span> Actualizar';
+}
+
+function modoCrear() {
+  formTitulo.textContent = "Nuevo registro";
+  formSubtitulo.textContent = "Completa los campos y presiona Guardar.";
+  btnGuardar.innerHTML = '<span class="btn-icon">+</span> Guardar';
+}
+
 function persistir() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+}
+
+function coincide(reg) {
+  if (!filtro) return true;
+  return CAMPOS.some((c) => String(reg[c] || "").toLowerCase().includes(filtro));
 }
 
 function render() {
   tbody.innerHTML = "";
 
-  registros.forEach((reg, i) => {
+  const visibles = registros
+    .map((r, i) => ({ r, i }))
+    .filter(({ r }) => coincide(r));
+
+  contador.textContent = String(registros.length);
+
+  if (visibles.length === 0) {
+    vacio.classList.add("activo");
+    if (filtro) {
+      vacio.querySelector("p").textContent = "Sin coincidencias.";
+      vacio.querySelector("span").textContent = "Prueba con otro término de búsqueda.";
+    } else {
+      vacio.querySelector("p").textContent = "No hay registros todavía.";
+      vacio.querySelector("span").textContent = "Agrega el primero usando el formulario de arriba.";
+    }
+    return;
+  }
+
+  vacio.classList.remove("activo");
+
+  visibles.forEach(({ r, i }) => {
     const tr = document.createElement("tr");
 
     CAMPOS.forEach((campo) => {
       const td = document.createElement("td");
-      td.textContent = reg[campo] != null ? reg[campo] : "";
+      td.textContent = r[campo] != null && r[campo] !== "" ? r[campo] : "—";
       tr.appendChild(td);
     });
 
     const tdAcciones = document.createElement("td");
+    tdAcciones.className = "celda-acciones";
 
     const btnE = document.createElement("button");
     btnE.textContent = "Editar";
