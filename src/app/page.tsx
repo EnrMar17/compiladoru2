@@ -24,6 +24,7 @@ export default function Home() {
   const [htmlGenerado, setHtmlGenerado] = useState("");
   const [cssGenerado, setCssGenerado] = useState("");
   const [jsGenerado, setJsGenerado] = useState("");
+  const [clavePrimariaManual, setClavePrimariaManual] = useState(false);
 
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
@@ -300,21 +301,46 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
-  const generarHTML = (tabla: any) => {
-    const nombreTabla = tabla.tabla;
-    const columnas: any[] = tabla.columnas || [];
+  const generarHTML = (tabla: any, claveManual: boolean = false) => {
+    const nombreTabla = tabla?.tabla || "tabla";
+    const columnas: any[] = tabla?.columnas || [];
+    const foreignKeys: any[] = tabla?.foreignKeys || [];
+    const nombreNormalizado = String(nombreTabla).toLowerCase();
+    const obtenerRelacion = (columna: string) =>
+      foreignKeys.find((fk: any) => String(fk?.from || "") === columna);
+    const esColumnaId = (c: any) => {
+      const nombre = String(c?.name || "").toLowerCase();
+      const esRelacion = Boolean(obtenerRelacion(c?.name));
+      return (
+        Boolean(c?.pk) ||
+        nombre === "id" ||
+        nombre === `id_${nombreNormalizado}` ||
+        nombre === `id${nombreNormalizado}` ||
+        nombre === "id_tabla" ||
+        (nombre.startsWith("id_") && !esRelacion)
+      );
+    };
+    const columnasFormulario = columnas.filter(
+      (c: any) => claveManual || !esColumnaId(c)
+    );
 
-    const inputs = columnas
+    const inputs = columnasFormulario
       .map((c: any) => {
         const tipo = String(c.type || "").toUpperCase();
+        const relacion = obtenerRelacion(c.name);
+        const esLlavePrimaria = esColumnaId(c);
         let inputType = "text";
         if (tipo.includes("INT")) inputType = "number";
         else if (tipo.includes("REAL") || tipo.includes("FLOAT") || tipo.includes("DOUBLE") || tipo.includes("NUMERIC") || tipo.includes("DECIMAL")) inputType = "number";
+        else if (tipo.includes("DATETIME") || tipo.includes("TIMESTAMP")) inputType = "datetime-local";
         else if (tipo.includes("DATE")) inputType = "date";
+        else if (tipo.includes("TIME")) inputType = "time";
 
         return `      <div class="campo">
-        <label for="${c.name}">${c.name}</label>
+        <label for="${c.name}">${c.name}${relacion ? ` (relación con ${relacion.table || "otra tabla"})` : ""}</label>
         <input type="${inputType}" id="${c.name}" name="${c.name}" placeholder="${c.name}">
+        ${esLlavePrimaria ? `<small>Clave primaria: identifica este registro.</small>` : ""}
+        ${relacion ? `<small>Dato relacionado con otra tabla.</small>` : ""}
       </div>`;
       })
       .join("\n");
@@ -336,27 +362,36 @@ export default function Home() {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-inner">
-      <div class="hero-text">
-        <span class="badge">Aplicación CRUD generada</span>
-        <h1>${nombreTabla}</h1>
-        <p>Gestiona los registros de la tabla <strong>${nombreTabla}</strong> con persistencia local.</p>
-      </div>
-      <div class="stats">
-        <div class="stat">
-          <span class="stat-label">Registros</span>
-          <span class="stat-value" id="contador">0</span>
-        </div>
+  <header class="encabezado">
+    <div>
+      <h1>CRUD generado</h1>
+      <p>Tabla seleccionada: <strong>${nombreTabla}</strong></p>
+      <p>Lenguajes y Automatas II</p>
+      <div class="equipo">
+        <span>Desarrollado por:</span>
+        <ul>
+          <li>José Antonio Medina Ayala</li>
+          <li>Cesar Enrique Díaz Maldonado</li>
+          <li>Enrique Martínez</li>
+        </ul>
       </div>
     </div>
   </header>
 
   <main class="contenedor">
+    <section class="ayuda card">
+      <h2>Ayuda</h2>
+      <ul>
+        <li>La clave primaria identifica cada registro.</li>
+        <li>Si no sabes qué valor poner, puedes dejar que el sistema la genere automáticamente.</li>
+        <li>Una clave foránea sirve para relacionar datos con otra tabla.</li>
+      </ul>
+    </section>
+
     <section class="card">
       <div class="card-header">
         <h2 id="formTitulo">Nuevo registro</h2>
-        <p id="formSubtitulo">Completa los campos y presiona Guardar.</p>
+        <p id="formSubtitulo">Completa los campos y guarda el registro.</p>
       </div>
 
       <form id="formulario" autocomplete="off">
@@ -377,7 +412,6 @@ ${inputs}
       <div class="card-header card-header-row">
         <div>
           <h2>Registros</h2>
-          <p>Listado completo de la tabla <strong>${nombreTabla}</strong>.</p>
         </div>
         <div class="toolbar">
           <input type="text" id="buscador" placeholder="Buscar..." class="buscador">
@@ -396,17 +430,11 @@ ${ths}
         </table>
 
         <div id="vacio" class="vacio">
-          <div class="vacio-icono">∅</div>
-          <p>No hay registros todavía.</p>
-          <span>Agrega el primero usando el formulario de arriba.</span>
+          <p>Sin registros.</p>
         </div>
       </div>
     </section>
   </main>
-
-  <footer class="pie">
-    <p>CRUD generado automáticamente · Persistencia con <code>localStorage</code></p>
-  </footer>
 
   <script src="script.js"></script>
 </body>
@@ -420,25 +448,23 @@ ${ths}
 }
 
 :root {
-  --c-bg: #f8fafc;
+  --c-bg: #f1f5f9;
   --c-surface: #ffffff;
   --c-border: #e2e8f0;
   --c-border-strong: #cbd5e1;
   --c-text: #0f172a;
   --c-text-soft: #475569;
   --c-text-muted: #94a3b8;
-  --c-primary: #4f46e5;
-  --c-primary-hover: #4338ca;
-  --c-primary-soft: #eef2ff;
+  --c-primary: #1e293b;
+  --c-primary-hover: #334155;
+  --c-primary-soft: #f8fafc;
   --c-danger: #dc2626;
   --c-danger-hover: #b91c1c;
   --c-edit: #2563eb;
   --c-edit-hover: #1d4ed8;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 12px 30px rgba(15, 23, 42, 0.12);
-  --radius: 16px;
-  --radius-sm: 10px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --radius: 14px;
+  --radius-sm: 8px;
 }
 
 html, body {
@@ -448,124 +474,87 @@ html, body {
 
 body {
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  background:
-    radial-gradient(1200px 600px at -10% -20%, #e0e7ff 0%, transparent 60%),
-    radial-gradient(900px 500px at 110% -10%, #ede9fe 0%, transparent 55%),
-    var(--c-bg);
+  background: var(--c-bg);
   color: var(--c-text);
   min-height: 100vh;
   line-height: 1.5;
 }
 
-/* HERO */
-.hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #312e81 100%);
-  color: #ffffff;
-  padding: 56px 24px 80px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 -1px 0;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, var(--c-bg));
-}
-
-.hero-inner {
+.encabezado {
   max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  position: relative;
-  z-index: 1;
+  margin: 24px auto;
+  padding: 24px;
+  background: #0f172a;
+  color: #ffffff;
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
 }
 
-.hero-text h1 {
-  font-size: 42px;
+.encabezado h1 {
+  font-size: 28px;
   font-weight: 700;
-  margin: 12px 0 8px;
-  letter-spacing: -0.02em;
-  text-transform: capitalize;
+  margin: 0 0 8px;
 }
 
-.hero-text p {
-  margin: 0;
+.encabezado p {
+  margin: 0 0 6px;
   color: #cbd5e1;
-  font-size: 16px;
-  max-width: 520px;
+  font-size: 15px;
 }
 
-.hero-text strong {
+.encabezado strong {
   color: #ffffff;
   font-weight: 600;
 }
 
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e0e7ff;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 999px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.encabezado span {
+  color: #e2e8f0;
+  font-size: 13px;
 }
 
-.stats {
-  display: flex;
-  gap: 12px;
+.equipo {
+  margin-top: 10px;
 }
 
-.stat {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-sm);
-  padding: 14px 22px;
-  text-align: center;
-  backdrop-filter: blur(6px);
+.equipo ul,
+.ayuda ul {
+  margin: 6px 0 0 18px;
+  padding: 0;
 }
 
-.stat-label {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #cbd5e1;
+.equipo li {
+  color: #e2e8f0;
+  font-size: 13px;
 }
 
-.stat-value {
-  display: block;
-  font-size: 28px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-top: 4px;
-}
-
-/* CONTENEDOR */
 .contenedor {
   max-width: 1100px;
-  margin: -40px auto 0;
-  padding: 0 24px 40px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
   display: grid;
   gap: 24px;
-  position: relative;
-  z-index: 2;
 }
 
 .card {
   background: var(--c-surface);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--c-border);
   overflow: hidden;
+}
+
+.ayuda {
+  padding: 18px 24px;
+}
+
+.ayuda h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.ayuda li {
+  color: var(--c-text-soft);
+  font-size: 14px;
 }
 
 .card-header {
@@ -616,6 +605,12 @@ label {
   letter-spacing: 0.04em;
 }
 
+small {
+  margin-top: 6px;
+  color: var(--c-text-soft);
+  font-size: 12px;
+}
+
 input {
   padding: 11px 14px;
   font-size: 14px;
@@ -638,7 +633,7 @@ input:hover {
 
 input:focus {
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.12);
   background: #ffffff;
 }
 
@@ -659,28 +654,21 @@ button {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.btn:active,
-button:active {
-  transform: translateY(1px);
 }
 
 .btn-primary,
 #btnGuardar {
   background: var(--c-primary);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .btn-primary:hover,
 #btnGuardar:hover {
   background: var(--c-primary-hover);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
 }
 
 .btn-secondary,
@@ -790,7 +778,6 @@ tbody tr:last-child td {
 
 .btn-editar {
   background: var(--c-edit);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
 .btn-editar:hover {
@@ -799,7 +786,6 @@ tbody tr:last-child td {
 
 .btn-eliminar {
   background: var(--c-danger);
-  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
 }
 
 .btn-eliminar:hover {
@@ -809,69 +795,30 @@ tbody tr:last-child td {
 /* ESTADO VACÍO */
 .vacio {
   display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
+  padding: 34px 20px;
   text-align: center;
   color: var(--c-text-muted);
 }
 
 .vacio.activo {
-  display: flex;
-}
-
-.vacio-icono {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--c-bg);
-  border: 2px dashed var(--c-border-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: var(--c-text-muted);
-  margin-bottom: 14px;
+  display: block;
 }
 
 .vacio p {
-  margin: 0 0 4px;
+  margin: 0;
   font-weight: 600;
   color: var(--c-text-soft);
   font-size: 15px;
 }
 
-.vacio span {
-  font-size: 13px;
-}
-
-/* FOOTER */
-.pie {
-  max-width: 1100px;
-  margin: 20px auto 40px;
-  padding: 0 24px;
-  text-align: center;
-  color: var(--c-text-muted);
-  font-size: 13px;
-}
-
-.pie code {
-  background: var(--c-border);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: var(--c-text);
-}
-
-/* RESPONSIVE */
 @media (max-width: 640px) {
-  .hero {
-    padding: 36px 20px 60px;
+  .encabezado {
+    margin: 16px;
+    padding: 20px;
   }
 
-  .hero-text h1 {
-    font-size: 32px;
+  .encabezado h1 {
+    font-size: 24px;
   }
 
   .contenedor {
@@ -926,14 +873,43 @@ tbody tr:last-child td {
 `;
   };
 
-  const generarJS = (tabla: any) => {
-    const nombreTabla = tabla.tabla;
-    const columnas: any[] = tabla.columnas || [];
+  const generarJS = (tabla: any, claveManual: boolean = false) => {
+    const nombreTabla = tabla?.tabla || "tabla";
+    const columnas: any[] = tabla?.columnas || [];
+    const foreignKeys: any[] = tabla?.foreignKeys || [];
+    const nombreNormalizado = String(nombreTabla).toLowerCase();
+    const obtenerRelacion = (columna: string) =>
+      foreignKeys.find((fk: any) => String(fk?.from || "") === columna);
+    const esColumnaId = (c: any) => {
+      const nombre = String(c?.name || "").toLowerCase();
+      const esRelacion = Boolean(obtenerRelacion(c?.name));
+      return (
+        Boolean(c?.pk) ||
+        nombre === "id" ||
+        nombre === `id_${nombreNormalizado}` ||
+        nombre === `id${nombreNormalizado}` ||
+        nombre === "id_tabla" ||
+        (nombre.startsWith("id_") && !esRelacion)
+      );
+    };
     const campos = columnas.map((c: any) => c.name);
+    const camposFormulario = columnas
+      .filter((c: any) => claveManual || !esColumnaId(c))
+      .map((c: any) => c.name);
+    const camposId = columnas
+      .filter((c: any) => esColumnaId(c))
+      .map((c: any) => c.name);
     const camposJson = JSON.stringify(campos);
+    const camposFormularioJson = JSON.stringify(camposFormulario);
+    const camposIdJson = JSON.stringify(camposId);
 
     return `const STORAGE_KEY = "${nombreTabla}";
 const CAMPOS = ${camposJson};
+const CAMPOS_FORMULARIO = ${camposFormularioJson};
+const CAMPOS_ID = ${camposIdJson};
+const CLAVE_PRIMARIA_MANUAL = ${claveManual};
+
+// SweetAlert2.
 
 let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let filtro = "";
@@ -942,7 +918,6 @@ const tbody = document.querySelector("#tabla tbody");
 const inputIndice = document.getElementById("__indice");
 const buscador = document.getElementById("buscador");
 const vacio = document.getElementById("vacio");
-const contador = document.getElementById("contador");
 const formTitulo = document.getElementById("formTitulo");
 const formSubtitulo = document.getElementById("formSubtitulo");
 const btnGuardar = document.getElementById("btnGuardar");
@@ -983,22 +958,22 @@ function notif(icon, title) {
   });
 }
 
-function guardar() {
+async function guardar() {
   const datos = {};
   let vacios = [];
 
-  CAMPOS.forEach((campo) => {
+  CAMPOS_FORMULARIO.forEach((campo) => {
     const el = document.getElementById(campo);
     const valor = el ? el.value.trim() : "";
     datos[campo] = valor;
     if (!valor) vacios.push(campo);
   });
 
-  if (vacios.length === CAMPOS.length) {
+  if (CAMPOS_FORMULARIO.length > 0 && vacios.length === CAMPOS_FORMULARIO.length) {
     Swal.fire({
       icon: "warning",
       title: "Formulario vacío",
-      text: "Completa al menos un campo antes de guardar.",
+      text: "Completa al menos un campo.",
       customClass: SWAL_CLASSES,
     });
     return;
@@ -1007,9 +982,54 @@ function guardar() {
   const idx = parseInt(inputIndice.value, 10);
   const editando = idx >= 0;
 
+  if (CLAVE_PRIMARIA_MANUAL) {
+    const claveVacia = CAMPOS_ID.some((campo) => !String(datos[campo] || "").trim());
+    if (claveVacia) {
+      Swal.fire({
+        icon: "warning",
+        title: "Falta la clave primaria",
+        text: "Escribe la clave primaria.",
+        customClass: SWAL_CLASSES,
+      });
+      return;
+    }
+
+    const claveRepetida = registros.some((reg, i) => {
+      if (editando && i === idx) return false;
+      return CAMPOS_ID.some((campo) => String(reg[campo]) === String(datos[campo]));
+    });
+
+    if (claveRepetida) {
+      Swal.fire({
+        icon: "warning",
+        title: "Clave primaria repetida",
+        text: "Ya existe un registro con esa clave primaria.",
+        customClass: SWAL_CLASSES,
+      });
+      return;
+    }
+  }
+
+  const confirmacion = await Swal.fire({
+    title: editando ? "¿Actualizar este registro?" : "¿Guardar este registro?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Confirmar",
+    cancelButtonText: "Cancelar",
+    reverseButtons: true,
+    customClass: SWAL_CLASSES,
+  });
+
+  if (!confirmacion.isConfirmed) return;
+
   if (editando) {
-    registros[idx] = datos;
+    registros[idx] = Object.assign({}, registros[idx], datos);
   } else {
+    if (!CLAVE_PRIMARIA_MANUAL) {
+      CAMPOS_ID.forEach((campo) => {
+        datos[campo] = siguienteId(campo);
+      });
+    }
     registros.push(datos);
   }
 
@@ -1018,12 +1038,12 @@ function guardar() {
   modoCrear();
   render();
 
-  notif("success", editando ? "Registro actualizado" : "Registro creado");
+  notif("success", editando ? "Registro actualizado correctamente." : "Registro guardado correctamente.");
 }
 
 function editar(i) {
   const reg = registros[i];
-  CAMPOS.forEach((campo) => {
+  CAMPOS_FORMULARIO.forEach((campo) => {
     const el = document.getElementById(campo);
     if (el) el.value = reg[campo] != null ? reg[campo] : "";
   });
@@ -1054,7 +1074,7 @@ function eliminar(i) {
 }
 
 function limpiar() {
-  CAMPOS.forEach((campo) => {
+  CAMPOS_FORMULARIO.forEach((campo) => {
     const el = document.getElementById(campo);
     if (el) el.value = "";
   });
@@ -1063,18 +1083,26 @@ function limpiar() {
 
 function modoEditar() {
   formTitulo.textContent = "Editar registro";
-  formSubtitulo.textContent = "Modifica los campos y presiona Guardar para actualizar.";
+  formSubtitulo.textContent = "Modifica los campos y guarda los cambios.";
   btnGuardar.innerHTML = '<span class="btn-icon">✓</span> Actualizar';
 }
 
 function modoCrear() {
   formTitulo.textContent = "Nuevo registro";
-  formSubtitulo.textContent = "Completa los campos y presiona Guardar.";
+  formSubtitulo.textContent = "Completa los campos y guarda el registro.";
   btnGuardar.innerHTML = '<span class="btn-icon">+</span> Guardar';
 }
 
 function persistir() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+}
+
+function siguienteId(campo) {
+  const mayor = registros.reduce((max, reg) => {
+    const valor = Number(reg[campo]);
+    return Number.isFinite(valor) && valor > max ? valor : max;
+  }, 0);
+  return mayor + 1;
 }
 
 function coincide(reg) {
@@ -1089,17 +1117,9 @@ function render() {
     .map((r, i) => ({ r, i }))
     .filter(({ r }) => coincide(r));
 
-  contador.textContent = String(registros.length);
-
   if (visibles.length === 0) {
     vacio.classList.add("activo");
-    if (filtro) {
-      vacio.querySelector("p").textContent = "Sin coincidencias.";
-      vacio.querySelector("span").textContent = "Prueba con otro término de búsqueda.";
-    } else {
-      vacio.querySelector("p").textContent = "No hay registros todavía.";
-      vacio.querySelector("span").textContent = "Agrega el primero usando el formulario de arriba.";
-    }
+    vacio.querySelector("p").textContent = "Sin registros.";
     return;
   }
 
@@ -1141,9 +1161,17 @@ render();
 
   const generarAplicacionCRUD = (tabla: any) => {
     setTablaSeleccionada(tabla);
-    setHtmlGenerado(generarHTML(tabla));
+    setHtmlGenerado(generarHTML(tabla, clavePrimariaManual));
     setCssGenerado(generarCSS());
-    setJsGenerado(generarJS(tabla));
+    setJsGenerado(generarJS(tabla, clavePrimariaManual));
+  };
+
+  const cambiarClavePrimariaManual = (valor: boolean) => {
+    setClavePrimariaManual(valor);
+    if (!tablaSeleccionada) return;
+    setHtmlGenerado(generarHTML(tablaSeleccionada, valor));
+    setCssGenerado(generarCSS());
+    setJsGenerado(generarJS(tablaSeleccionada, valor));
   };
 
   const probarCRUD = () => {
@@ -1174,6 +1202,15 @@ render();
               <h1 className="text-3xl font-bold text-white">
                 Generador de Aplicaciones - Lenguajes y Automatas II
               </h1>
+
+              <div className="mt-3 text-sm text-slate-200">
+                <p className="font-medium">Desarrollado por:</p>
+                <ul className="mt-1 list-disc pl-5">
+                  <li>José Antonio Medina Ayala</li>
+                  <li>Cesar Enrique Díaz Maldonado</li>
+                  <li>Enrique Martínez</li>
+                </ul>
+              </div>
 
               <div className="mt-2 flex gap-2">
                 <span className="rounded-md bg-white/10 px-2 py-0.5 text-xs text-white">
@@ -1392,7 +1429,7 @@ render();
 
                 {/* COLUMNAS */}
                 <div className="mt-3 space-y-2">
-                  {t.columnas.map((c: any, idx: number) => (
+                  {(t.columnas || []).map((c: any, idx: number) => (
                     <div
                       key={idx}
                       className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
@@ -1416,14 +1453,14 @@ render();
                 </div>
 
                 {/* FOREIGN KEYS */}
-                {t.foreignKeys.length > 0 && (
+                {(t.foreignKeys || []).length > 0 && (
                   <div className="mt-4 border-t pt-3">
                     <p className="text-xs font-semibold text-slate-500">
                       Relaciones
                     </p>
 
                     <div className="mt-2 space-y-1 text-sm text-blue-600">
-                      {t.foreignKeys.map((fk: any, idx: number) => (
+                      {(t.foreignKeys || []).map((fk: any, idx: number) => (
                         <div key={idx}>
                           {fk.from} →{" "}
                           <span className="font-medium">
@@ -1440,7 +1477,7 @@ render();
                     onClick={() => generarAplicacionCRUD(t)}
                     className="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
                   >
-                    Generar código CRUD
+                    Generar aplicación CRUD
                   </button>
                 </div>
               </div>
@@ -1460,6 +1497,28 @@ render();
                   ? `Aplicación generada para la tabla: ${tablaSeleccionada.tabla}`
                   : "Selecciona una tabla y presiona “Generar aplicación CRUD”."}
               </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Descarga los tres archivos en la misma carpeta y abre index.html
+                en el navegador.
+              </p>
+              <label className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={clavePrimariaManual}
+                  onChange={(e) =>
+                    cambiarClavePrimariaManual(e.target.checked)
+                  }
+                  className="mt-1 h-4 w-4 rounded border-slate-300"
+                />
+                <span>
+                  <span className="block font-medium">
+                    Quiero ingresar la clave primaria manualmente
+                  </span>
+                  <span className="block text-slate-500">
+                    Si no sabes qué es esto, no te preocupes, déjanoslo a nosotros.
+                  </span>
+                </span>
+              </label>
             </div>
 
             {tablaSeleccionada && (
