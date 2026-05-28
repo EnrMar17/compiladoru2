@@ -20,6 +20,11 @@ export default function Home() {
   const [estructuraBD, setEstructuraBD] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
+  const [tablaSeleccionada, setTablaSeleccionada] = useState<any>(null);
+  const [htmlGenerado, setHtmlGenerado] = useState("");
+  const [cssGenerado, setCssGenerado] = useState("");
+  const [jsGenerado, setJsGenerado] = useState("");
+
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
 
@@ -277,10 +282,14 @@ export default function Home() {
     }
   };
 
-  const descargarArchivo = (contenido: string, nombre: string) => {
+  const descargarArchivo = (
+    contenido: string,
+    nombre: string,
+    mime: string = "text/plain;charset=utf-8"
+  ) => {
     if (!contenido) return;
 
-    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([contenido], { type: `${mime};charset=utf-8` });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -289,6 +298,331 @@ export default function Home() {
     a.click();
 
     URL.revokeObjectURL(url);
+  };
+
+  const generarHTML = (tabla: any) => {
+    const nombreTabla = tabla.tabla;
+    const columnas: any[] = tabla.columnas || [];
+
+    const inputs = columnas
+      .map((c: any) => {
+        const tipo = String(c.type || "").toUpperCase();
+        let inputType = "text";
+        if (tipo.includes("INT")) inputType = "number";
+        else if (tipo.includes("REAL") || tipo.includes("FLOAT") || tipo.includes("DOUBLE") || tipo.includes("NUMERIC") || tipo.includes("DECIMAL")) inputType = "number";
+        else if (tipo.includes("DATE")) inputType = "date";
+
+        return `      <div class="campo">
+        <label for="${c.name}">${c.name}</label>
+        <input type="${inputType}" id="${c.name}" name="${c.name}" placeholder="${c.name}">
+      </div>`;
+      })
+      .join("\n");
+
+    const ths = columnas
+      .map((c: any) => `          <th>${c.name}</th>`)
+      .join("\n");
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD de ${nombreTabla}</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="contenedor">
+    <h1>CRUD de ${nombreTabla}</h1>
+
+    <form id="formulario" autocomplete="off">
+      <input type="hidden" id="__indice" value="-1">
+${inputs}
+      <div class="acciones">
+        <button type="button" id="btnGuardar">Guardar</button>
+        <button type="button" id="btnLimpiar">Limpiar</button>
+      </div>
+    </form>
+
+    <table id="tabla">
+      <thead>
+        <tr>
+${ths}
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+`;
+  };
+
+  const generarCSS = () => {
+    return `* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 30px 20px;
+}
+
+.contenedor {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+h1 {
+  margin: 0 0 24px 0;
+  font-size: 26px;
+  color: #0f172a;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+input {
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  background: #f8fafc;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+input:focus {
+  border-color: #0f172a;
+  background: #ffffff;
+}
+
+.acciones {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+button {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+#btnGuardar {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+#btnGuardar:hover {
+  background: #1e293b;
+}
+
+#btnLimpiar {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+#btnLimpiar:hover {
+  background: #cbd5e1;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+thead {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+.btn-editar,
+.btn-eliminar {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  margin-right: 6px;
+  color: #ffffff;
+}
+
+.btn-editar {
+  background: #2563eb;
+}
+
+.btn-editar:hover {
+  background: #1d4ed8;
+}
+
+.btn-eliminar {
+  background: #dc2626;
+}
+
+.btn-eliminar:hover {
+  background: #b91c1c;
+}
+`;
+  };
+
+  const generarJS = (tabla: any) => {
+    const nombreTabla = tabla.tabla;
+    const columnas: any[] = tabla.columnas || [];
+    const campos = columnas.map((c: any) => c.name);
+    const camposJson = JSON.stringify(campos);
+
+    return `const STORAGE_KEY = "${nombreTabla}";
+const CAMPOS = ${camposJson};
+
+let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+const form = document.getElementById("formulario");
+const tbody = document.querySelector("#tabla tbody");
+const inputIndice = document.getElementById("__indice");
+
+document.getElementById("btnGuardar").addEventListener("click", guardar);
+document.getElementById("btnLimpiar").addEventListener("click", limpiar);
+
+function guardar() {
+  const datos = {};
+  CAMPOS.forEach((campo) => {
+    const el = document.getElementById(campo);
+    datos[campo] = el ? el.value : "";
+  });
+
+  const idx = parseInt(inputIndice.value, 10);
+
+  if (idx >= 0) {
+    registros[idx] = datos;
+  } else {
+    registros.push(datos);
+  }
+
+  persistir();
+  limpiar();
+  render();
+}
+
+function editar(i) {
+  const reg = registros[i];
+  CAMPOS.forEach((campo) => {
+    const el = document.getElementById(campo);
+    if (el) el.value = reg[campo] != null ? reg[campo] : "";
+  });
+  inputIndice.value = String(i);
+}
+
+function eliminar(i) {
+  if (!confirm("¿Eliminar este registro?")) return;
+  registros.splice(i, 1);
+  persistir();
+  limpiar();
+  render();
+}
+
+function limpiar() {
+  CAMPOS.forEach((campo) => {
+    const el = document.getElementById(campo);
+    if (el) el.value = "";
+  });
+  inputIndice.value = "-1";
+}
+
+function persistir() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+}
+
+function render() {
+  tbody.innerHTML = "";
+
+  registros.forEach((reg, i) => {
+    const tr = document.createElement("tr");
+
+    CAMPOS.forEach((campo) => {
+      const td = document.createElement("td");
+      td.textContent = reg[campo] != null ? reg[campo] : "";
+      tr.appendChild(td);
+    });
+
+    const tdAcciones = document.createElement("td");
+
+    const btnE = document.createElement("button");
+    btnE.textContent = "Editar";
+    btnE.className = "btn-editar";
+    btnE.addEventListener("click", () => editar(i));
+
+    const btnD = document.createElement("button");
+    btnD.textContent = "Eliminar";
+    btnD.className = "btn-eliminar";
+    btnD.addEventListener("click", () => eliminar(i));
+
+    tdAcciones.appendChild(btnE);
+    tdAcciones.appendChild(btnD);
+    tr.appendChild(tdAcciones);
+
+    tbody.appendChild(tr);
+  });
+}
+
+render();
+`;
+  };
+
+  const generarAplicacionCRUD = (tabla: any) => {
+    setTablaSeleccionada(tabla);
+    setHtmlGenerado(generarHTML(tabla));
+    setCssGenerado(generarCSS());
+    setJsGenerado(generarJS(tabla));
   };
 
   return (
@@ -561,9 +895,118 @@ export default function Home() {
                     </div>
                   </div>
                 )}
+
+                <div className="mt-4 border-t pt-3">
+                  <button
+                    onClick={() => generarAplicacionCRUD(t)}
+                    className="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+                  >
+                    Generar aplicación CRUD
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* GENERADOR DE APLICACIÓN CRUD */}
+        <div className="mt-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">
+                Generador de aplicación CRUD
+              </h2>
+              <p className="text-sm text-slate-500">
+                {tablaSeleccionada
+                  ? `Aplicación generada para la tabla: ${tablaSeleccionada.tabla}`
+                  : "Selecciona una tabla y presiona “Generar aplicación CRUD”."}
+              </p>
+            </div>
+
+            {tablaSeleccionada && (
+              <span className="rounded-md bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                Tabla: {tablaSeleccionada.tabla}
+              </span>
+            )}
+          </div>
+
+          {!tablaSeleccionada ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-slate-500">
+              Aún no se ha generado ninguna aplicación CRUD.
+            </div>
+          ) : (
+            <div className="mt-6 grid gap-6 lg:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-700">
+                    HTML generado
+                  </h3>
+                  <button
+                    onClick={() =>
+                      descargarArchivo(htmlGenerado, "index.html", "text/html")
+                    }
+                    disabled={!htmlGenerado}
+                    className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Descargar index.html
+                  </button>
+                </div>
+                <textarea
+                  value={htmlGenerado}
+                  readOnly
+                  className="h-80 w-full resize-none rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900 outline-none"
+                />
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-700">
+                    CSS generado
+                  </h3>
+                  <button
+                    onClick={() =>
+                      descargarArchivo(cssGenerado, "styles.css", "text/css")
+                    }
+                    disabled={!cssGenerado}
+                    className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Descargar styles.css
+                  </button>
+                </div>
+                <textarea
+                  value={cssGenerado}
+                  readOnly
+                  className="h-80 w-full resize-none rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900 outline-none"
+                />
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-700">
+                    JavaScript generado
+                  </h3>
+                  <button
+                    onClick={() =>
+                      descargarArchivo(
+                        jsGenerado,
+                        "script.js",
+                        "text/javascript"
+                      )
+                    }
+                    disabled={!jsGenerado}
+                    className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Descargar script.js
+                  </button>
+                </div>
+                <textarea
+                  value={jsGenerado}
+                  readOnly
+                  className="h-80 w-full resize-none rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900 outline-none"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </main>
