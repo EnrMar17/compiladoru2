@@ -625,6 +625,24 @@ render();
     setJsGenerado(generarJS(tabla));
   };
 
+  const probarCRUD = () => {
+    if (!htmlGenerado || !cssGenerado || !jsGenerado) return;
+
+    const htmlInline = htmlGenerado
+      .replace(
+        /<link\s+rel="stylesheet"\s+href="styles\.css">/,
+        `<style>\n${cssGenerado}\n</style>`
+      )
+      .replace(
+        /<script\s+src="script\.js"><\/script>/,
+        `<script>\n${jsGenerado}\n</script>`
+      );
+
+    const blob = new Blob([htmlInline], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
       <div className="mx-auto max-w-7xl">
@@ -901,7 +919,7 @@ render();
                     onClick={() => generarAplicacionCRUD(t)}
                     className="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
                   >
-                    Generar aplicación CRUD
+                    Generar código CRUD
                   </button>
                 </div>
               </div>
@@ -924,9 +942,18 @@ render();
             </div>
 
             {tablaSeleccionada && (
-              <span className="rounded-md bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
-                Tabla: {tablaSeleccionada.tabla}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="rounded-md bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                  Tabla: {tablaSeleccionada.tabla}
+                </span>
+                <button
+                  onClick={probarCRUD}
+                  disabled={!htmlGenerado}
+                  className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Probar CRUD
+                </button>
+              </div>
             )}
           </div>
 
